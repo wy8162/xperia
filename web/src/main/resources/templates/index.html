@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot Recipes – Library</title>
+</head>
+<body>
+<h1>Welcome</h1>
+<a th:href="@{/stocks}" href="#">List of stocks</a>
+<br/>
+<ol>
+    <li><a th:href="@{/stocks/500}" href="#">5xx error page</a></li>
+    <li><a th:href="@{/notfound}" href="#">Demostrate Exception Handler</a></li>
+    <li><a th:href="@{/anythingNotExist}" href="#">Generic error page - not allowed</a></li>
+</ol>
+</body>
+</html>

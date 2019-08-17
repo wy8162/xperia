@@ -1,0 +1,61 @@
+= URL PathMatcher
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+Usually, by default, given a RESTful request with the following URI
+
+....
+http://localhost:8000/measurements/2015-09-01T16:00:00.000Z
+....
+
+Real value of "2015-09-01T16:00:00.000Z" the controller gets will be "2015-09-01T16:00:00", which misses ".000Z". The reason for this is because Spring by default will match the path with extension. Here, ".000Z" is being treated as extension for requested type for the representation of the response.
+
+There are two ways to solve this issue.
+
+== Disable Matching Extension Globally
+
+[source,java]
+----
+@Configuration
+public class WebMvcConfig extends WebMvcConfigurationSupport           // <1>
+{
+    @Override public void configureContentNegotiation(                 // <2>
+            final ContentNegotiationConfigurer configurer)
+    {
+        configurer.favorPathExtension(false).                          // <3>
+                favorParameter(true).
+                parameterName("mediaType").
+                ignoreAcceptHeader(true).
+                useJaf(false).
+                defaultContentType(MediaType.APPLICATION_JSON).
+                mediaType("json", MediaType.APPLICATION_JSON);
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {  // <4>
+        configurer.setUseSuffixPatternMatch(false);                   // <5>
+    }
+}
+----
+<1> Web configuration extending WebMvcConfigurationSupport.
+<2> Configuring content negotiation.
+<3> Not using path extension to determine type of response.
+<4> Configure path match.
+<5> Disable suffix pattern matching.
+
+== Disable Suffix Pattern Matching at Endpoint
+
+[source,java]
+----
+@RestController
+public class AController
+{
+    @GetMapping("/{timestamp:.+}")                                  // <1>
+    public ResponseEntity<Measurement> getMeasurement(@PathVariable ZonedDateTime timestamp) {
+        // ...
+    }
+}
+----
+<1> Use regexp to match the whole path variable, which stops matching extension for this particular endpoint.

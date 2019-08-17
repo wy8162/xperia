@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>My Stocks</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<h1>Stock Portfolio</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Shares</th>
+        <th>Purchase Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="stock : ${stocks}">
+        <td th:text="${stock.stockName}">Name</td>
+        <td th:text="${stock.shares}">Shares</td>
+        <td th:text="${stock.date}">date</td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/addstock}" href="#">Add a Stock</a>
+</body>
+</html>

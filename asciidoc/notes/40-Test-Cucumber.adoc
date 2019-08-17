@@ -1,0 +1,154 @@
+= Cucumber BDD
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+== Structuring Cucumber BDD
+=== Location of Features
+Stores the feature files in folder [black white-background]#src/test/resources/features/#. The feature files can be organized in different folders based on domains.
+
+[NOTE]
+====
+....
+src/test/resources/features
+                    |---weather
+                         |---file1.feature
+                         |---file2.feature
+                    |---stats
+                         |---file3.feature
+                         |---file4.feature
+....
+====
+
+=== Put the Cucumber Test Program in Root Directory
+[source,java]
+----
+package y.w.bdd;
+
+@RunWith(Cucumber.class)
+@CucumberOptions(plugin = "pretty",
+        features = { "classpath:features"},                     // <1>
+        glue={"classpath:com.c1.weathertracker.bdd",            // <2>
+              "classpath:com.c1.weathertracker.typeregistry"})  // <3>
+public class WeathertrackerCucumberTests
+{
+}
+----
+<1> defines where to find feature files.
+<2> define where to find step definitions.
+<3> define where to find type registry.
+
+=== Create an Abstract Spring Test Class
+[source,java]
+----
+@SpringBootTest(classes = WeatherTrackerApplication.class,                    // <1>
+                webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ContextConfiguration
+@DirtiesContext
+public class AbstractSpringConfigurationTest
+{
+}
+----
+<1> Specify the application configuration class.
+
+=== Keep all the Common Steps in One File
+Move all the common steps, like Background steps, into one single step definition Java class. This class extends the abstract Spring test class.
+
+Only [black white-background]#ONE# step definition Java class needs to extend it.
+
+[source,java]
+----
+public class CommonStepDefs extends AbstractSpringConfigurationTest           // <1>
+{
+    @Autowired
+    private StepDefsHelper helper;                                            // <2>
+
+    @Given("the response has a status code of {int}")
+    public void the_response_has_a_status_code_of(Integer statusCode)
+    {
+        assertThat(helper.getResultSet().responseCode).isEqualTo(statusCode);
+    }
+}
+----
+<1> Extends AbstractSpringConfigurationTest.
+<2> Auto wire a help class so that steps can share data.
+
+Other step definition files should be grouped based on domain.
+
+=== Register Types
+[source,java]
+----
+public class TypeRegistryConfiguration implements TypeRegistryConfigurer              // <1>
+{
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override public Locale locale()
+    {
+        return ENGLISH;
+    }
+
+    @Override
+    public void configureTypeRegistry(TypeRegistry typeRegistry)
+    {
+        typeRegistry.defineDataTableType(                                            // <2>
+                new DataTableType(
+                        JsonDTO.class,
+                        (TableTransformer<JsonDTO>) table ->
+                                new JsonDTO(table.asMaps())));
+
+        JacksonTableTransformer transformer = new JacksonTableTransformer();
+
+        typeRegistry.setDefaultDataTableCellTransformer(transformer);                // <3>
+        typeRegistry.setDefaultDataTableEntryTransformer(transformer);               // <4>
+        typeRegistry.setDefaultParameterTransformer(transformer);                    // <5>
+    }
+
+    private static final class JacksonTableTransformer implements
+            ParameterByTypeTransformer,
+            TableEntryByTypeTransformer,
+            TableCellByTypeTransformer
+    {
+        private final ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        public <T> T transform(Map<String, String> entry, Class<T> type, TableCellByTypeTransformer cellTransformer)
+        {
+            return objectMapper.convertValue(entry, type);
+        }
+
+        @Override
+        public <T> T transform(String value, Class<T> cellType) throws Throwable
+        {
+            return objectMapper.readValue(new StringReader(value), cellType);
+        }
+
+        @Override public Object transform(String s, Type type) throws Throwable
+        {
+            if (type.equals(String.class))
+            {
+                return s;
+            }
+            @SuppressWarnings("unchecked")
+            Class<?> clazz = (Class<?>) type;
+            Object o = objectMapper.readValue(new StringReader(s), clazz);
+            return o;
+        }
+    }
+}
+----
+<1> Extends TypeRegistryConfigurer.
+<2> Convert table to JSON data, with header as fields.
+<3> Transform table cell.
+<4> Transform table row with header as fields.
+<5> Transform string to object.
+
+== Cucumber Data Table
+
+. List<String> list = dataTable.asList(String.class)
+. List<Map<String, String>> list = dt.asMaps(String.class, String.class)
+. List<List<String>> lists = dataTable.asLists(String.class)
+. List<Map<String, String>> lists = dataTable.asList(Map.class)
+. Map<String, String> m = dataTable.asMap(String.class, String.class)
+. Map<String, List<String>> m = dataTable.asMap(String.class, new TypeReference<List<String>>(){}.getType())
+. Map<String, Map<String, String>> m = dataTable.asMap(String.class, new TypeReference<Map<String, String>>(){}.getType())

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot Recipes - Library - Resource Not Found</title>
+</head>
+<body>
+<h1>500 Error Page</h1>
+<div th:if="${parameters != null}">
+    <h3>Parameters</h3>
+    <span th:each="parameter :${parameters}">
+    <div th:text="${parameter.key} + ' : ' + ${#strings.arrayJoin(parameter.value, ',')}"></div>
+</span>
+</body>
+</html>

@@ -1,0 +1,62 @@
+= HTTP Request
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+=== URI
+....
+            userinfo          host        port
+        ┌───────┴───────┐ ┌────┴────────┐ ┌┴┐
+ http://john.doe:password@www.example.com:123/forum/questions/?tag=networking&order=newest#top
+ └─┬─┘ └───────────┬────────────────────────┘└─┬─────────────┘└────────┬──────────────────┘└┬─┘
+ scheme         authority                      path                  query             fragment
+....
+
+=== Request Message
+A request message consists of the following:
+
+. A request line. The format is as below
+.. <Request Method> <PATH of Resource> HTTP/1.1
+.. I.e., GET /users/adamatan/repos?type=owner HTTP/1.1
+. Request header fields
+. Empty line, containing  <CR><LF> only
+. An optional message body
+
+The request line and the other header fields must each end with  <CR><LF>.
+
+[NOTE]
+====
+Sample Request
+```
+GET / HTTP/1.1
+Host: erbosoft .com
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.104 Safari/537.36
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8
+If-Modified-Since: Tue, 07 Feb 2012 04:44:06 GMT
+```
+====
+
+[NOTE]
+====
+Sample Response
+'''
+HTTP/1.1 200 OK
+Date: Tue, 25 Jun 2019 14:09:37 GMT
+Server: Apache/2.4.33 (Unix)
+Content-Location: index.html.en
+Vary: negotiate
+TCN: choice
+Last-Modified: Mon, 11 Jun 2007 18:53:14 GMT
+ETag: "2d-432a5e4a73a80;55462ec078fc0"
+Accept-Ranges: bytes
+Content-Length: 45
+Content-Type: text/html
+
+<html><body><h1>It works!</h1></body></html>
+'''
+===

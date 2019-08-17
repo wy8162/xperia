@@ -1,0 +1,174 @@
+= Java Date Time
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+==== LocalDateTime
+LocalDateTime java.time.LocalDateTime is strictly not a part of the set of classes responsible for time zones handling. However, it will be, in most likelihood, the class on top of which time zones will be added on majority of occasions (except those few cases where instances of java.time.Instant are being used). Hence, its importance!
+
+==== LocalDateTime
+LocalDateTime contains a date and a time; a combination of a LocalDate and a LocalTime. The key aspect of LocalDateTime is that the time is indeed “local”, i.e. it belongs to a local time-line with no time zone associated with it. So, to make this time relevant in a global context we will need to add a time zone to it. This will be done using the LocalDateTime.atZone(ZoneId zoneId) method. This method returns an instance of a ZonedDateTime which contains the date and time along with time zone passed to it using zoneId.
+
+==== Instant
+Instant: java.time.Instant is the class encapsulating the time elapsed from the standard Java epoch(beginning of time in Java) of 1970-01-01T00:00:00Z. Instant instances do have a time zone associated with them – UTC to be specific. So, an instance of Instant holds a value of date-time with a UTC time-line.
+
+However, you may want to change the time zone of an Instant to something other than UTC for which Instant.atZone() method comes in handy. Instant.atZone(ZoneId zoneId) method returns a ZonedDateTime instance with the time zone converted to the zoneId passed as a parameter to the method.
+
+==== ZonedDateTime
+ZonedDateTime: As we saw above, on invoking the atZone() method of both LocalDateTime and Instant results in an instance of java.time.ZonedDateTime being returned. When working with date-time objects with a time zone, ZonedDateTime is what you must use as your primary class to hold the objects as well as to manipulate them as per your needs.
+
+==== ZoneId
+ZoneId: java.time.ZoneId is the unique identifier of a time zone. As we saw above, converting both LocalDateTime and an Instant requires us to tell the exact ‘zone ID’ for the resulting ZonedDateTime. Zone ID holds the time zone value which is equivalent to what we say in common parlance as “UTC-8:00” or “America/Los_Angeles” or “PST”.
+
+===== Zone IDs are of 3 main types
+ZoneOffset: These are normalized Zone Ids, denoted by “Z”, and show time in ‘UTC+/-’ format. Example: ‘20:30Z’.
+Offset Style Zone Ids: These start with ‘UTC’, ‘GMT’ or ‘UT’ and show time with +/- prepended to them. Example: ‘GMT+02:00’.
+Region Based Ids: These do not start with ‘UTC’, ‘GMT’, ‘UT’ ‘+’ or ‘-‘, and are of minimum 2 characters. They have the format ‘{area}/{city}’. Example: “America/Los_Angeles”. To reference a complete list of region based IDs supported in Java, please refer the table here.
+
+==== ZoneOffset
+ZoneOffset: ZoneOffset is a type of a zone identifier and represents the offset of a time zone from UTC or Greenwich(GMT). UTC-based ZoneOffset instances provide a standard way for working with time zones; which is perhaps the reason why java designers used ZoneOffset as the standard time zone identifier for instances of java.time.Instant. For example: An Instant value would look like this – ‘2016-11-29T16:47:37.545Z’ where ‘Z’ at the end indicates that a ZoneOffset of ‘UTC+00:00’ is being used.
+
+==== ZoneRules
+ZoneRules:An instance of java.time.zone.ZoneRules encapsulates the rules for converting a given Date-Time to a specific ZoneId. You can get the ZoneRules for a ZoneId by invoking ZoneId.getRules() method on a ZoneId instance.
+
+All the rules specific to a time zone, such as conversions to/from that zone during ‘day light saving’, or during the transition times when the daylight saving is put in place or removed, etc are captured in ZoneRules. The good news is that the specific rules for all the time zones in existence today in the IANA Time Zone Database (TZDB) have already been incorporated in java.time.zone.DefaultZoneRulesProvider which is loaded by default.
+
+==== ZoneRulesProder
+ZoneRulesProvider: java.time.zone.ZoneRulesProvider is responsible for configuring of time zone rules at Java platform-level or environment level. The ZoneRulesProvider(s) to be used for a JVM instance can be declared via a configuration file or programmatically. However, for most common time zone uses the DefaultZoneRulesProvider, mentioned earlier, will be sufficient.
+
+. LocalDate
+
+LocalDate has year, month and date for local time, [black white-background]#without timezone information#.
+
+. LocalTime
+
+LocalTime has hours, minutes, seconds, nanoseconds, etc, [black white-background]#without timezone# information.
+
+. LocalDateTime
+
+LocalDateTime has both date and time locally, without [black white-background]#time zone information#.
+
+. ZonedDateTime
+
+ZonedDateTime has data, time, timezone, and zone offset information.
+
+[source,groovy]
+----
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+LocalDate today = LocalDate.now();  //1 - Recommended
+
+println(today)
+println(today.getDayOfMonth())
+
+today = LocalDate.parse("2019-03-27")
+
+println(LocalTime.now())
+println(LocalDateTime.now())
+
+println(ZonedDateTime.now())
+println(ZonedDateTime.now(ZoneId.of("UTC")))
+println(ZonedDateTime.now(ZoneId.of("UTC+1")))
+println(ZonedDateTime.of(LocalDate.now(), LocalTime.now(), ZoneId.of("UTC+5")))
+
+println(ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]"))
+ZonedDateTime zd = ZonedDateTime.parse("2019-08-12T16:25:47.455Z[UTC]")
+println("Datetime = " + zd + " Zone=" + zd.getZone())
+zd = ZonedDateTime.parse("2019-08-12T16:25:47.455Z")
+println("Datetime = " + zd + " Zone=" + zd.getZone())
+
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss a");
+String ts = "2019-03-27 10:15:30 AM";
+
+LocalDateTime date = LocalDateTime.parse(ts, formatter);
+ZonedDateTime resultZd =ZonedDateTime.of(date, ZoneId.systemDefault());
+println(resultZd)
+
+//Starting with an java.time.Instant value
+Instant timeStamp= Instant.now();
+System.out.println("Machine Time Now:" + timeStamp);
+
+//timeStamp in zone - "America/Los_Angeles"
+ZonedDateTime LAZone= timeStamp.atZone(ZoneId.of("America/Los_Angeles"));
+System.out.println("In Los Angeles(America) Time Zone:"+ LAZone);
+----
+
+[NOTE]
+====
+[source,java]
+----
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+public class InstantTimeZoneHandling {
+  public static void main(String args[]) {
+    //Starting with an java.time.Instant value
+    Instant timeStamp= Instant.now();
+    System.out.println("Machine Time Now:" + timeStamp);
+
+    //timeStamp in zone - "America/Los_Angeles"
+    ZonedDateTime LAZone= timeStamp.atZone(ZoneId.of("America/Los_Angeles"));
+    System.out.println("In Los Angeles(America) Time Zone:"+ LAZone);
+
+    //timeStamp in zone - "GMT+01:00"
+    ZonedDateTime timestampAtGMTPlus1= timeStamp.atZone(ZoneId.of("GMT+01:00"));
+    System.out.println("In 'GMT+01:00' Time Zone:"+ timestampAtGMTPlus1);
+  }
+}
+----
+====
+
+- Instant objects are by default in UTC time zone. Printing the value of *timestamp* gives us *2016-11-29T14:23:25.551Z*. ‘Z’ here denotes the UTC+00:00 time zone.
+- We then use the Instant.atZone() method to convert timeStamp’s time zone to the "America/Los Angeles" time zone using ZoneId.of() method like this – timeStamp.atZone(ZoneId.of("America/Los_Angeles")).
+- ZoneId.of() method returns a ‘proper’ ZoneId instance which is standard in the java.time package. This ZoneId is then fed as input to atZone() method.
+- The atZone() method returns a ZonedDateTime instance which contains timeStamp’s time converted to its equivalent time in "America/Los_Angeles" time zone which is 2016-11-29T06:23:25.551-08:00[America/Los_Angeles], which is 8 hours behind UTC time.
+- Similarly, using the "GMT+01:00" time zone we get the timeStamp’s equivalent time in a ZonedDateTime instance which is 2016-11-29T15:23:25.551+01:00[GMT+01:00]
+
+
+[NOTE]
+====
+Adding time zone to LocalDateTime
+
+[source,java]
+----
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+public class LocalDateTimeWithTimeZones {
+  public static void main(String args[]) {
+    //Starting with an java.time.LocalDateTime value of '2016-11-28T09:30'
+    LocalDateTime localDateTime= LocalDateTime.of(2016, 11, 28, 9, 30);
+    System.out.println("LocalDateTime is:"+ localDateTime);
+
+    //Adding "America/Los_Angeles" as the Time Zone to localDateTime
+    ZonedDateTime LAZonedDateTime= localDateTime.atZone(ZoneId.of("America/Los_Angeles"));
+    System.out.println("In Los Angeles(America) Time Zone:"+ LAZonedDateTime);
+  }
+}
+----
+====
+
+[NOTE]
+====
+Converting ZonedDateTime to different time zones
+
+```
+//LAZonedDateTime's equivalent in "UTC+00:00" Time Zone
+ZonedDateTime LADateTimeToUTC= LAZonedDateTime.withZoneSameInstant(ZoneId.of("UTC+00:00"));
+System.out.println("Converted to 'UTC' Time Zone:"+ LADateTimeToUTC);
+
+//LAZonedDateTime's equivalent in "GMT+01:00" Time Zone
+ZonedDateTime LADateTimeToGMTPlus1= LAZonedDateTime.withZoneSameInstant(ZoneId.of("GMT+01:00"));
+System.out.println("Converted to 'GMT+01:00' Time Zone:"+ LADateTimeToGMTPlus1);
+```
+====

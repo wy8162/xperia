@@ -1,0 +1,80 @@
+= Path Matching
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+The dot in the path variable at the end of URI causes two unexpected behaviors, unexpected to those who are not familiar to the huge number of Spring configuration properties.
+
+The first is that the default Spring configuration matches all path extentions. So setting up a mapping for [black white-background]#/api/{file}# will mean that Spring maps a call to [black white-background]#/api/milefile.html# to the String argument [black white-background]#myfile#. This is usefule if you want to matc [black white-background]#/api/myfile.html#, [black white-background]#/api/myfile.md#, etc.
+
+The second problem is related to the first and correctly fixed by [black white-background]#@masstroy#. When /api/myfile.* points to the myfile resource, Spring assumes the path extension (.html, .txt, etc.) indicates that the resource should be returned with a specific format. This behaviour can also be very useful in some situations. But often, it will mean that the object returned by a method mapping cannot be converted into this format, and Spring will throw a HttpMediaTypeNotAcceptableException.
+
+=== Solutions
+
+. Using Regular Expression
+
+Regular expression in the path definition can solve this issue. For example:
+
+[source,java]
+----
+@RestController
+class AController
+{
+    @RequestMapping(value = "user/by-email/{email:.+}")
+    {}
+}
+----
+
+The syntax {varName:regex} declares a URI variable with a regular expression that has syntax of {varName:regex}. For example, given URL "/spring-web-3.0.5 .jar", the following method extracts the name, version, and file extension:
+
+[source,java]
+----
+@RestController
+class AController
+{
+    @GetMapping("/{name:[a-z-]+}-{version:\\d\\.\\d\\.\\d}{ext:\\.[a-z]+}")
+    public void handle(@PathVariable String version, @PathVariable String ext)
+    {}
+}
+----
+
+This will match [black white-background]#/user/by-email/xya@abc.com#.
+
+. Using a Slash
+
+This will match [black white-background]#/user/by-email/xya@abc.com/#.
+
+. Turn off Suffix Matching Globally
+
+In case we don't want to hack each endpoint with regexp, this can be turned off globally:
+
+[source,java]
+----
+@Configuration
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    // turn off all suffix pattern matching
+    configurer.setUseSuffixPatternMatch(false);
+    // OR
+    // turn on suffix pattern matching ONLY for suffixes
+    // you explicitly register using
+    // configureContentNegotiation(...)
+    configurer.setUseRegisteredSuffixPatternMatch(true);
+  }
+
+  @Override
+  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+      // Spring will no longer use the file extension to override the accepts
+      // mediaType of the request
+    configurer.favorPathExtension(false);
+  }
+}
+----
+
+=== Reference
+https://stackoverflow.com/questions/27419743/spring-path-variable-truncate-after-dot-annotation[Path variable truncate after dot - annotation]
+
+https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#spring-web[URI patterns]

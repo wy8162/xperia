@@ -1,0 +1,738 @@
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '4519b',
+  'FRANCE',
+  45000,
+  1
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519a',
+  'FRANCE',
+  650000,
+  2
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519b',
+  'FRANCE',
+  650000,
+  3
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '4519b',
+  'FRANCE',
+  45000,
+  4
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519a',
+  'FRANCE',
+  650000,
+  5
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519b',
+  'FRANCE',
+  650000,
+  6
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '4519b',
+  'FRANCE',
+  45000,
+  7
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519b',
+  'ITALY',
+  15000,
+  8
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519a',
+  'FRANCE',
+  650000,
+  9
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  10,
+  '9519b',
+  'FRANCE',
+  650000,
+  10
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '3788a',
+  'INDIA',
+  75000,
+  11
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '3788a',
+  'PAKISTAN',
+  37500,
+  12
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '3788b',
+  'INDIA',
+  5090,
+  13
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '4519a',
+  'INDIA',
+  650000,
+  14
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '4519b',
+  'INDIA',
+  5090,
+  15
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '4519a',
+  'CHINA',
+  650000,
+  16
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  20,
+  '4519b',
+  'CHINA',
+  5090,
+  17
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '9519b',
+  'US',
+  145000,
+  18
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4577b',
+  'US',
+  25000,
+  19
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '7588b',
+  'CANADA',
+  50000,
+  20
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '9519b',
+  'CANADA',
+  75000,
+  21
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '4519b',
+  'CANADA',
+  120000,
+  22
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '3788a',
+  'US',
+  4950,
+  23
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788a',
+  'US',
+  4950,
+  24
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788b',
+  'US',
+  15000,
+  25
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '9519b',
+  'US',
+  145000,
+  26
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4577b',
+  'US',
+  25000,
+  27
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '7588b',
+  'CANADA',
+  50000,
+  28
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '9519b',
+  'CANADA',
+  75000,
+  29
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '4519b',
+  'CANADA',
+  120000,
+  30
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '3788a',
+  'US',
+  4950,
+  31
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788a',
+  'US',
+  4950,
+  32
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788b',
+  'US',
+  15000,
+  33
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '9519b',
+  'US',
+  145000,
+  34
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4577b',
+  'US',
+  25000,
+  35
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '7588b',
+  'CANADA',
+  50000,
+  36
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '9519b',
+  'CANADA',
+  75000,
+  37
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  30,
+  '4519b',
+  'CANADA',
+  120000,
+  38
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '3788a',
+  'US',
+  4950,
+  39
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788a',
+  'US',
+  4950,
+  40
+);
+
+
+INSERT INTO SALES
+(
+  DEPT_NO,
+  PART_NO,
+  COUNTRY,
+  AMOUNT,
+  ORDER_NO
+)
+VALUES
+(
+  40,
+  '4788b',
+  'US',
+  15000,
+  41
+);
+
+

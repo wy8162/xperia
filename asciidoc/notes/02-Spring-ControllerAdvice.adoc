@@ -1,0 +1,279 @@
+= Controller Advice and Exception Handler
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+Exception handling is another type of cross cut concern.  [blue white-background]#@ControllerAdvice# is used to handle [blue white-background]#@ExceptionHandler# , [blue white-background]#@InitBinder#, and [blue white-background]#@ModelAttribute#.
+
+== Exception Handler
+
+Instead of adding exception handling everywhere in controllers, we can define exception handlers in either the controller or as a controller advice.
+
+=== Exception Handler for Rest Controller
+
+Here is a @RestController
+
+*RESTful controller*
+[source,java,numbered]
+----
+@RestController
+@RequestMapping("/measurements")
+public class MeasurementsResourceController
+{
+    private final MeasurementStore  store;
+    private final DateTimeFormatter dateTimeFormatter;
+
+    @Autowired
+    public MeasurementsResourceController(MeasurementStore store, DateTimeFormatter dateTimeFormatter) {
+        this.store = store;
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
+
+    @ApiOperation(value="Create a measurement", response = boolean.class)
+    @ApiResponses(value={
+            @ApiResponse(code = 200, message = "Successfully created measurement"),
+            @ApiResponse(code = 400, message = "Bad request")
+    })
+    @PostMapping
+    public ResponseEntity<?> createMeasurement(@Valid @RequestBody Measurement measurement) {
+        boolean result = store.add(measurement);
+
+        log.info(measurement.toString());
+
+        if (result)
+            // HttpStatus.CREATED, implicit by method created()
+            return ResponseEntity
+                    .created(URI.create("/measurements/" +  dateTimeFormatter.format(measurement.getTimestamp())))
+                    .build();
+        else
+            throw new MeasurementBadRequestException("Measurement not created: " + measurement.toString()); // <1>
+    }
+
+    @GetMapping("/{timestamp:.+}")
+    public ResponseEntity<Measurement> getMeasurement(@PathVariable ZonedDateTime timestamp) {
+        Optional<Measurement> measurement = store.fetch(timestamp);
+
+        if (measurement.isPresent()) {
+            return ResponseEntity.ok(measurement.get());
+        } else
+            throw new MeasurementNotFoundException("Measurement not found for timestamp " + timestamp);    // <2>
+    }
+
+    @GetMapping("/except")
+    public ResponseEntity<String> getExcept()
+    {
+        throw new ServiceServerErrorException("Internal Server error");                                    // <3>
+    }
+}
+----
+<1> Throws MeasurementBadRequestException
+<2> Throws MeasurementNotFoundException
+<3> Throws ServiceServerErrorException
+
+This way, the controller will focus on handling business logic and only handle normal case, HttpStatus.OK. As to the exceptions, they will be handled by controller advice.
+
+==== Create Custom Exception
+
+We will create a custom exception which will extend RuntimeException.
+
+
+*Custom Exception*
+[source,java,numbered]
+----
+public class WeatherServiceException extends RuntimeException       // <1>
+{
+    public WeatherServiceException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * This is to prevent exception stacktace to be printed on console.
+     * @return
+     */
+    @Override
+    public synchronized Throwable fillInStackTrace() {              // <2>
+        return this;
+    }
+}
+
+public class MeasurementNotFoundException extends WeatherServiceException // <3>
+{
+    public MeasurementNotFoundException(String message)
+    {
+        super(message);
+    }
+}
+
+public class MeasurementBadRequestException extends WeatherServiceException
+{
+    public MeasurementBadRequestException(String message)
+    {
+        super(message);
+    }
+}
+----
+<1> Create a base custom exception.
+<2> Override method fillInStackTrace() to avoid printing exception stacktrace.
+<3> Custom exception for Not Found issue.
+
+==== Create a Controller Advice
+[source,java,numbered]
+----
+@ControllerAdvice(basePackages = "y.w.controller")                                      // <1>
+public class WeatherServiceErrorAdvice
+{
+    @ExceptionHandler({RuntimeException.class, ServiceServerErrorException.class, SQLException.class, NullPointerException.class})
+    public ResponseEntity<Error> handleRunTimeException(RuntimeException e)
+    {
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, e);
+    }
+
+    @ExceptionHandler({ MeasurementNotFoundException.class, StatisticsNotFoundException.class })
+    public ResponseEntity<Error> handleNotFoundException(WeatherServiceException e)
+    {
+        return error(HttpStatus.NOT_FOUND, e);
+    }
+
+    @ExceptionHandler({ MeasurementBadRequestException.class, StatisticsBadRequestException.class, HttpMessageNotReadableException.class })
+    public ResponseEntity<Error> handleDogsServiceException(WeatherServiceException e)
+    {
+        return error(HttpStatus.BAD_REQUEST, e);
+    }
+
+    private ResponseEntity<Error> error(HttpStatus status, Exception e)
+    {
+        log.error("Exception : ", e);
+        return ResponseEntity.status(status).body(new Error(e.getMessage()));
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Error                                                   // <2>
+    {
+        private String message;
+    }
+}
+----
+<1> Annonated the class as controller advice which can be applicable to all controllers or to targets specified by package or class.
+<2> Error class can be returned so that it can be serialized to JSON. A string can't be serialized to JSON and will cause client exception.
+
+==== Create a Controller Advice without Custom Exception
+There is a short way to create controller advice which doesn't need to create custom exception.
+
+[source,java]
+----
+@ControllerAdvice
+public class SystemErrorAdvice
+{
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)                                                       // <1>
+    @ExceptionHandler({ ServiceServerErrorException.class, SQLException.class, NullPointerException.class}) // <2>
+    public void handleInternalServerError() {}                                                              // <3>
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ HttpMessageNotReadableException.class })
+    public void handleBadRequest(){}
+}
+----
+<1> Annotate the method with HttpStatus value.
+<2> Handle multiple exceptions.
+<3> Empty method body.
+
+The advantage is that it is simple to implement. The disadvantage is that there is no more detail other than the status code.
+
+==== Controller for Web Application
+
+[source,java]
+----
+@ControllerAdvice
+public class ControllerExceptionHandler
+{
+    @ExceptionHandler
+    public ModelAndView handleDefault(BadRequestException e)       // <1>
+    {
+        log.info("From @ControllerAdvice");
+        ModelAndView model = new ModelAndView("error/exception"); // <2>
+            model.addObject("exception", e);
+            return model;                                         // <3>
+    }
+}
+----
+<1> Handle exception.
+<2> Return view name for error page.
+<3> Add model attribute for exception details so that it can be displayed on screen.
+
+== @InitBind
+
+[blue white-background]#@InitBinder# can define converter for parameter. It can be used either as controller advice or directly on a method.
+
+[source,java]
+----
+@ControllerAdvice(assignableTypes = { MeasurementsResourceController.class, StatsResourceController.class }) // <1>
+public class ControllerAdviceInitBinder
+{
+        webDataBinder.registerCustomEditor(                                                                  // <2>
+                ZonedDateTime.class,
+                new Editor<>(
+                        text -> ZonedDateTime
+                                .parse(text, DateTimeFormatter.ISO_ZONED_DATE_TIME)
+                                .withZoneSameInstant(ZoneId.of("UTC")),
+                                DateTimeFormatter.ISO_ZONED_DATE_TIME.toFormat()));
+    }
+}
+----
+<1> Apply the controller advice to specified controllers.
+<2> Register a custom editor to convert ISO 8061 timestamp to ZonedDateTime.
+
+*Usage*
+[source]
+----
+    @GetMapping("/{timestamp:.+}")
+    public ResponseEntity<Measurement> getMeasurement(@PathVariable ZonedDateTime timestamp)    // <1>
+----
+<1> With the @InitBinder, it makes it possible for Spring to parse string of timestamp to ZonedDateTime. Otherwise, it will have problem parsing string like 2015-09-02T16:00:00.000Z to ZonedDateTime.
+
+== @ModelAttribute
+When submit HTML form data to a controller, the data can be converted to an object. In this case, @ModelAttribute must be used.
+
+[source,java]
+----
+@Controller
+public class WebController
+{
+   @ModelAttribute(name = "stock")                                                                  // <1>
+    public Stock stockBean()
+    {
+        return new Stock();
+    }
+
+    @PostMapping("/submit")
+    public ModelAndView submit(@Valid @ModelAttribute(value="stock") Stock stock, Errors errors)    // <2>
+    {
+        if (errors.hasErrors())
+        {
+            ModelAndView model = new ModelAndView("submit");
+            model.addObject("errors", errors);
+            return model;
+        }
+
+        // Do something with services...
+        stocks.add(stock);
+
+        ModelAndView model = new ModelAndView("list"); // the view name to go
+        model.addObject("stocks", stocks);          // passing model data to the view
+        return model;
+    }
+}
+----
+<1> Must declare @ModelAttribute for Stock object.
+<2> Must specify the parameter as @ModelAttribute so that form data can be de-serialized as an instance of class Stock.
+
+
+
+
+
+
+

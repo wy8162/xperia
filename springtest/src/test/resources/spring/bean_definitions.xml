@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop
+                           https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- Neither name nor ID assigned. No way to autowire it unless @Qualifier is used -->
+    <bean class="y.w.spring.beans.Person"
+          init-method="init"
+          destroy-method="destroy">
+        <constructor-arg type = "int" value = "${age}"/>
+        <constructor-arg type = "java.lang.String" value = "${name}"/>
+    </bean>
+
+    <bean id="anotherPerson" class="y.w.spring.beans.Person"
+          init-method="init"
+          destroy-method="destroy">
+        <constructor-arg type = "int" value = "${age}"/>
+        <constructor-arg type = "java.lang.String" value = "anotherPerson ${name}"/>
+    </bean>
+</beans>

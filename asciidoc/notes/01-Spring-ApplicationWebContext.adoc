@@ -1,0 +1,124 @@
+= ApplicationContext vs WebApplicationContext
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Contentvs
+
+Spring MVC has two kinds of application contexts:
+
+. ApplicationContext
+. WebApplicationContext
+
+image::images/mvc-context-hierarchy.png[Context Hierarchy]
+
+== ApplicationContext
+[blue white-background]#ApplicationContext# is the context initialized by a [blue white-background]#ContextLoaderListener# or [blue white-background]#ContextLoaderServlet# that we define in application's web.xml file.
+
+[NOTE]
+====
+[source,xml,numbered]
+----
+<web-app>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/root-context.xml</param-value>
+    </context-param>
+</web-app>
+----
+====
+
+In the above configuration, we are asking Spring to load root-context.xml and create an Application Context from it. If [blue white-background]#contextConfigLocation# is not mentioned as in the below snippet, it will by default look for [blue white-background]#/WEB-INF/applicationContext.xml#.
+
+== WebApplicationContext
+WebApplicationContext is the another servlet-specific context that is loaded based on the dispatcher servlets configured in the application’s web.xml file. So each dispatcher servlet has its own servlet-context initialized from <servlet-name>-servlet.xml file. This allows us to categorize the incoming requests based on the servlet’s url-pattern and handle them accordingly, such that one of dispatcher servlets could help serving the web pages via Controller, while another one could be used to implement a stateless REST web service. So with that, we understand that a single web application can have multiple dispatcher-servlet configurations, thereby having multiple web-application contexts.
+
+If we want to change the name of the dispatcher-servlet file name or change it’s location, we can add init-param with contextConfigLocation as param-name, as can be seen below
+
+[NOTE]
+====
+[source,xml,numbered]
+----
+<web-app>
+<servlet>
+	<servlet-name>mvc-dispatcher</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	<init-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/sample-dispatcher-servlet.xml</param-value>
+	</init-param>
+	<load-on-startup>1</load-on-startup>
+</servlet>
+
+<servlet-mapping>
+	<servlet-name>mvc-dispatcher</servlet-name>
+	<url-pattern>/</url-pattern>
+</servlet-mapping>
+</web-app>
+----
+====
+
+== Differences between ApplicationContext and WebApplicationContext
+So the best part of this article, is what’s the difference between the two contexts?
+
+Firstly, as already mentioned, [blue white-background]#ApplicationContext# is the [blue white-background]#root-context#, that has bean configurations we might want to use (and re-use) across the entire application as singletons. There is always a single application context in a web application. Whereas, there can be multiple WebApplicationContexts for each of the dispatcher servlets we specify in our application’s web.xml.
+
+It’s always better to keep a clear separation between middle-tier services such as business logic components and data access classes (which we prefer defining in the ApplicationContext XML), and web-related components such as controllers and view-resolvers (which we prefer defining in the respective dispatcher-servlet‘s WebApplicationContext).
+
+http://www.jcombat.com/spring/applicationcontext-webapplicationcontext[ApplicationContext vs WebApplicationContext]
+
+== Sample Configuration
+The following configures a WebApplicationContext hierarchy.
+[source,java,numbered]
+----
+public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class<?>[] { RootConfig.class };
+    }
+
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class<?>[] { App1Config.class };
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[] { "/app1/*" };
+    }
+}
+----
+
+The XML equivalence
+[source,xml,numbered]
+----
+<web-app>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/root-context.xml</param-value>     // <1>
+    </context-param>
+    <servlet>
+        <servlet-name>app1</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/app1-context.xml</param-value> // <2>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>app1</servlet-name>
+        <url-pattern>/app1/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+----
+<1> ApplicationContext
+<2> WebApplicationContext

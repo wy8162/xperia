@@ -1,0 +1,98 @@
+:source-highlighter: pygments
+
+= Notes for SEPA Compliance 2019
+This is all about SEPA Integration Test
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+:description: Example AsciiDoc document
+:keywords: AsciiDoc
+:imagesdir: ./img
+
+SEPA compliance tests include both outbound and inbound tests.
+
+== Inbound
+Yang Wang <yang.wang1@fiserv.com>
+
+The purpose of this work order is to backport the changes we made for SEPA Compliance 2019 for EBA Step2 from default Envoy to HSBC. There is no change to the design accept for the estimates and tasks list. C&P is a copy and paste task. Graft is a manual graft task. Use the original task listed as a baseline for how to do the new tasks.
+
+* *camt.027*: claim inquiry
+** Inbound from IP
+** Inbound from ESC
+
+. *camt.029*: response to claim inquiry
+.. Inbound from IP
+.. Inbound from ESC
+
+
+[cols=4*]
+|===
+|Header 1 |Header 2 |Header 3 |Header 4
+
+|Column 1, row 1
+|Column 2, row 1
+|Column 3, row 1
+|Column 4, row 1
+
+|Column 1, row 2
+|Column 2, row 2
+|Column 3, row 2
+|Column 4, row 2
+
+|Column 1, row 3
+|Column 2, row 3
+|Column 3, row 3
+|Column 4, row 3
+
+|Column 1, row 4
+|Column 2, row 4
+|Column 3, row 4
+|Column 4, row 4
+
+|ISO20022
+|SEPA Compliance
+|SWIFT
+|ACH Format
+|===
+
+
+=== Inbound Claim Inquiry Response camt.029
+
+=== Inbound Claim Inquiry camt.027
+
+== Outbound
+
+The purpose of this work order is to backport the changes we made for SEPA Compliance 2019 for EBA Step2 from default Envoy to HSBC. There is no change to the design accept for the estimates and tasks list. C&P is a copy and paste task. Graft is a manual graft task. Use the original task listed as a baseline for how to do the new tasks.
+
+== Implementation
+[source,java, numbered]
+        public ClaimResponseMatched(String caseId, String claimResponseStatusCode)
+        {
+            super(LOG_EVENT_CLAIM_RESPONSE_MATCHED_WITH_STATUS_CODE);
+            setParameter(1, caseId, Q5Constant.STRING);
+            setParameter(2, claimResponseStatusCode, Q5Constant.STRING);
+        }
+
+[TIP]
+====
+Think of c1..c2 as _all commits as of c1 (not including c1) until commit
+c2.
+====
+
+[WARNING]
+====
+This is a warning
+====
+
+.My header for the note
+[NOTE]
+====
+Blabla
+====
+
+== Reference
+
+https://www.vogella.com/tutorials/AsciiDoc/article.html[Using AsciiDoc and Asciidoctor to write documentation - Tutorial]
+

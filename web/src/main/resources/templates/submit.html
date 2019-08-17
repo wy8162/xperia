@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>My Stocks</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<h1>Stock Portfolio</h1>
+<a th:href="@{/}" href="#">Home</a>
+<h3>Enter</h3>
+<form action="#" th:action="@{/submit}" th:object="${stock}" method="post">
+    <p>Stock Name: <input type="text" th:field="*{stockName}"/>
+    <span class="validationError"
+          th:if="${#fields.hasErrors('stockName')}"
+          th:errors="*{stockName}">Stock Name Error</span>
+    <p>Shares: <input type="number" th:field="*{shares}"/>
+    <span class="validationError"
+          th:if="${#fields.hasErrors('shares')}"
+          th:errors="*{shares}">Shares Error</span>
+    <p>Date: <input type="date" th:field="*{date}"/>
+    <span class="validationError"
+          th:if="${#fields.hasErrors('date')}"
+          th:errors="*{date}">Date Error</span>
+    <p><input type="submit" value="Submit"/>
+</form>
+</body>
+</html>
