@@ -7,11 +7,13 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Positive;
 import java.util.Date;
 
 /**
- * Stock
+ * Stock - Using JSR-303 bean validation
  *
  * @author ywang
  * @date 8/6/2019
@@ -25,14 +27,15 @@ public class Stock
     @NotBlank(message = "Stock name is required")
     private String stockName;
 
-    @Pattern(regexp = "[\\s]*[0-9]*[1-9]+",message="Shares must be > 0")
+    @Positive(message = "Shares must be positive number")
     private int    shares;
 
     /**
      * @DateTimeFormat is important for Spring MVC to convert string, like 2019-08-01, to Date property for @ModelAttribute like
      *  submit(@ModelAttribute(value="stock") Stock stock)
      */
-    @NotBlank(message = "Purchase date cannot be empty") // For Form Data validation
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "Purchase date cannot be empty") // For Form Data validation
+    @Past(message = "Purchase date must be past")
+    @DateTimeFormat(pattern = "mm/dd/yyyy") // Date data binding
     private Date   date;
 }

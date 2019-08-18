@@ -23,6 +23,6 @@
         </tr>
     </c:forEach>
 </table>
-
+<a href="/webapp/employees/addNew">Add a New Employee</a>
 </body>
 </html>

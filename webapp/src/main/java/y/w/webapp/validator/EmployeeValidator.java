@@ -1,4 +1,4 @@
-package y.w.webapp.controller;
+package y.w.webapp.validator;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

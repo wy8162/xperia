@@ -9,6 +9,9 @@ import lombok.ToString;
 
 import java.io.Serializable;
 
+/**
+ * Using custom validation EmployeeValidator
+ */
 @Getter
 @Setter
 @AllArgsConstructor

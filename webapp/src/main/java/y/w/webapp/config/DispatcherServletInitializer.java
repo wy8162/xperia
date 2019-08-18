@@ -59,7 +59,12 @@ public class DispatcherServletInitializer extends AbstractAnnotationConfigDispat
     }
 
     /**
-     * Map DispatcherServlet to "/"
+     * Map DispatcherServlet to "/". Servlet mapping specifies the Servlet to be
+     * invoked by the container.
+     *
+     * All the controller request mappings are relative to Servlet mapping. Request
+     * mappings decide the handler method to be called.
+     *
      * @return
      */
     @Override

@@ -1,11 +1,14 @@
 package y.w.webapp.error;
 
+import lombok.Getter;
+
 /**
  * NotFoundException
  *
  * @author ywang
  * @date 8/7/2019
  */
+@Getter
 public class NotFoundException extends RuntimeException
 {
     private String errorCode;

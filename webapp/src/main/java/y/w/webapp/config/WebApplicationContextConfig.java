@@ -5,18 +5,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+import y.w.webapp.interceptor.CustomInterceptor;
 
 /**
  * WebConfig - this is the WebApplicationContext.
  *
  * For controllers, view resolvers, and handler mappings, etc. These drive the
  * front end.
+ *
+ * @EnableWeMvc causes Spring to configure DefaultAnnotationHandlerMapping,
+ * AnnotationMethodHandlerAdapter and ExceptionHandlerExceptionResolver. Additionally,
+ * it also enables support for @NumberFormat, @DateTimeFormat to format the
+ * form bean's fields during form binding, @Valid annotation to validate the
+ * controller method's parameters, @RequestBody and @ResponseBody annotation in the @RequestMapping
+ * or @ExceptionHandler methods during form binding.
  *
  * @author ywang
  * @date 8/14/2019
@@ -71,5 +82,14 @@ public class WebApplicationContextConfig implements WebMvcConfigurer
         messageSource.setDefaultEncoding("UTF-8");
 
         return messageSource;
+    }
+
+    @Bean CustomInterceptor customInterceptor() {
+        return new CustomInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(customInterceptor());
     }
 }

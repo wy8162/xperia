@@ -37,6 +37,11 @@
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.0.17.Final</version>
+        </dependency>
         <!-- Tag libs support for view layer -->
         <dependency>
             <groupId>javax.servlet</groupId>

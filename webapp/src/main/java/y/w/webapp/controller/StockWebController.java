@@ -1,23 +1,34 @@
 package y.w.webapp.controller;
 
 import lombok.extern.log4j.Log4j;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import y.w.webapp.error.BadRequestException;
 import y.w.webapp.error.NotFoundException;
 import y.w.webapp.model.Stock;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * EchoWebController
@@ -27,9 +38,11 @@ import java.util.List;
  */
 @Log4j
 @Controller
-@RequestMapping("/stock")
-public class SimpleWebController
+@RequestMapping("/stocks")
+public class StockWebController
 {
+    private Validator validator;
+
     private static final List<Stock> stocks = new ArrayList<>();
 
     static {
@@ -38,42 +51,39 @@ public class SimpleWebController
         stocks.add(new Stock("MOT", 100, new Date()));
     }
 
-    @RequestMapping
-    public String home(Model model)
+    public StockWebController()
     {
-        model.addAttribute("greeting", "Welcome to Stock Store");
-        model.addAttribute("tagline", "Stock Portfolio Management");
-
-        return "index";
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
-    @GetMapping("stocks/500")
+    @GetMapping("/500")
     public void error()
     {
         // Can be managed:
         // server.error.include-exception=true
         // server.error.include-stacktrace=awalys
-        throw new BadRequestException("7777", "Damn it, NPE Exception");
+        throw new BadRequestException("500", "500 Internal Server Error - Threw BadRequestException.");
     }
 
     @GetMapping("notfound")
     public void notFound()
     {
         // The exception handler will take over.
-        throw new NotFoundException("8877", "Damn it, not found");
+        throw new NotFoundException("404", "404 Not Found - NotFoundException");
     }
 
-    @RequestMapping("/stocks")
+    @RequestMapping
     public String allStocks(Model model)
     {
         model.addAttribute("stocks", stocks);
-        return "list"; // Expecting a view list.html
+        return "listStocks"; // Expecting a view list.html
     }
 
     @RequestMapping("/addstock")
-    public String addstock(Model model)
+    public String setup_Submit(Model model)
     {
-        return "submit";
+        return "addStock";
     }
 
     // We're building a simple web. So no service here.
@@ -91,24 +101,33 @@ public class SimpleWebController
      *
      *              Must declare a @ModelAttribute as above.
      * @param stock @Valid tells Spring MVC to validate the values. Stock has validation rules.
-     * @param errors
      * @return
      */
-    @PostMapping("/submit")
-    public ModelAndView submit(@Valid @ModelAttribute(value="stock") Stock stock, Errors errors)
+    @PostMapping("/addstock")
+    public ModelAndView submit(@Valid @ModelAttribute("stock") Stock stock, BindingResult result, SessionStatus status)
     {
-        if (errors.hasErrors())
+        Set<ConstraintViolation<Stock>> violations = validator.validate(stock);
+
+        for (ConstraintViolation<Stock> violation : violations)
         {
-            ModelAndView model = new ModelAndView("submit");
-            model.addObject("errors", errors);
-            return model;
+            String propertyPath = violation.getPropertyPath().toString();
+            String message = violation.getMessage();
+            // Add JSR-303 errors to BindingResult
+            // This allows Spring to display them in view via a FieldError
+            result.addError(new FieldError("stock", propertyPath,
+                    "Invalid "+ propertyPath + "(" + message + ")"));
+        }
+
+        if (result.hasErrors())
+        {
+            return new ModelAndView("addStock");
         }
 
         // Do something with services...
         stocks.add(stock);
 
-        ModelAndView model = new ModelAndView("list"); // the view name to go
-        model.addObject("stocks", stocks);          // passing model data to the view
+        ModelAndView model = new ModelAndView("listStocks"); // the view name to go
+        model.addObject("stocks", stocks);                // passing model data to the view
         return model;
     }
 
@@ -126,5 +145,15 @@ public class SimpleWebController
         ModelAndView model = new ModelAndView("error/exception"); // View name
         model.addObject("exception", e);
         return model;
+    }
+
+    /**
+     * To handle formating Date value from form.
+     *
+     * @param binder
+     */
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addCustomFormatter(new DateFormatter("yyyy-MM-dd"));
     }
 }
