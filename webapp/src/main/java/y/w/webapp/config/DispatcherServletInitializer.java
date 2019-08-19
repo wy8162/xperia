@@ -1,11 +1,6 @@
 package y.w.webapp.config;
 
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
 
 /**
  * MyWebAppInitializer
@@ -42,7 +37,7 @@ public class DispatcherServletInitializer extends AbstractAnnotationConfigDispat
     @Override
     protected Class<?>[] getRootConfigClasses()
     {
-        return null;
+        return new Class[]{RootApplicationContext.class};
     }
 
     /**

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import y.w.webapp.model.Employee;
+import y.w.webapp.service.EmployeeService;
 import y.w.webapp.validator.EmployeeValidator;
 
 @Controller
@@ -52,6 +53,12 @@ public class EmployeeController
         if (result.hasErrors()) {
             return "addEmployee";
         }
+
+        employeeService.addEmployee(
+                new Employee(employeeVO.getId(),
+                             employeeVO.getFirstName(),
+                             employeeVO.getLastName(),
+                             employeeVO.getEmail()));
 
         // Mark Session Complete
         status.setComplete();

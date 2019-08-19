@@ -1,6 +1,5 @@
-package y.w.webapp.controller;
+package y.w.webapp.service;
 
-import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 import y.w.webapp.model.Employee;
 
@@ -17,20 +16,26 @@ import java.util.List;
 @Service
 public class EmployeeService
 {
-    private final List<Employee> employees;
+    private List<Employee> employees = new ArrayList<>();
 
     public EmployeeService()
     {
-        this.employees = Arrays.asList(
+        this.employees.addAll(
+                Arrays.asList(
                 new Employee(1, "Jack", "Wang", "jackw@gmail.com"),
                 new Employee(1, "Jane", "Wan",  "janew@gmail.com"),
                 new Employee(1, "Yang", "Wang", "yangw@gmail.com")
-        );
+                ));
 
     }
 
     public List<Employee> getAllEmployees()
     {
         return this.employees;
+    }
+
+    public void addEmployee(Employee employee)
+    {
+        employees.add(employee);
     }
 }

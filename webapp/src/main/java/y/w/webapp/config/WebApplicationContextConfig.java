@@ -4,9 +4,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.format.FormatterRegistry;
-import org.springframework.format.datetime.DateFormatter;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -15,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import y.w.webapp.interceptor.CustomInterceptor;
+import y.w.webapp.security.WebSecurityConfig;
 
 /**
  * WebConfig - this is the WebApplicationContext.
@@ -34,7 +34,11 @@ import y.w.webapp.interceptor.CustomInterceptor;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan("y.w.webapp")
+@ComponentScan(basePackages = {
+        "y.w.webapp.controller",
+        "y.w.webapp.validator",
+        "y.w.webapp.service",
+})
 public class WebApplicationContextConfig implements WebMvcConfigurer
 {
     // If no view resolved configures yet, NameViewResolver is used by default

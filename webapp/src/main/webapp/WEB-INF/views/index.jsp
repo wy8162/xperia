@@ -14,6 +14,8 @@
     <h1> ${greeting} </h1>
     <p> ${tagline} </p>
 </div>
+<p>Login is needed to access Employee related pages. The user name / password is "wyang/wyang"
+or "admin/admin".</p>
 <table>
     <tr>
         <td><a href="/webapp/stocks">Stock List Pages</a></td>
