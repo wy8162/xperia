@@ -501,3 +501,65 @@ public class CachingMovieLister {
 . ServletConfigAware
 . ServletContextAware
 
+== Annotation-based Container Configuration
+[NOTE]
+====
+Annotation injection is performed before XML injection. Thus, the XML configuration overrides the annotations for properties weired through both approaches.
+====
+
+To register annotation based configuration:
+....
+<beans>
+    <context:annotation-config/>
+    ...
+</beans>
+....
+
+* @Required - indicates that the affected bean property must be populated at configuration time. Deprecated as of Spring Framework 5.1, in favor of using constructor injection for required settings.
+* @Autowired - applicable to constructors and traditional methods. Not necessary if only one constrcutor.
+* @Autowired(required = false) - by default, it fails when no matching candidate beans are available. This behavior can be changed by specifying "required = false". A non-required method will not be called at all if its dependency (or one of its dependencies in case of multiple arguments) is not available.
+* @Primary - because autowiring by type may lead to multiple candidates. @Primary can be used to indicate one bean as the primary candidate for autowiring to resolve the conflict.
+....
+@Configuration
+public class MovieConfiguration {
+    @Bean
+    @Primary
+    public MovieCatalog beanOne() { ... }
+
+    @Bean
+    public MovieCatalog beanTwo() { ... }
+}
+
+XML format:
+    <context:annotation-config/>
+    <bean class="example.SimpleMovieCatalog" primary="true" />
+    <bean class="example.SimpleMovieCatalog" />
+....
+
+* @Qualifier - assigns a qualifier id to a bean and use the qualifier along with the @Autowire.
+....
+public class MovieRecommender {
+    @Autowired
+    public void prepare(@Qualifier("main") MovieCatalog movieCatalog,      <1>
+            CustomerPreferenceDao customerPreferenceDao) {
+        ...
+    }
+}
+
+Bean definitions:
+    <bean class="example.SimpleMovieCatalog">
+        <qualifier value="main"/>                                          <2>
+    </bean>
+    <bean class="example.SimpleMovieCatalog">
+        <qualifier value="action"/>
+    </bean>
+    <bean id="movieRecommender" class="example.MovieRecommender"/>
+....
+<1> autowire the bean based on qualifier "main"
+<2> defines a bean with qualifier "main"
+
+=== Injection with JSR-250 @Resource
+@Resource can be used instead of @Autowired to inject dependency, in the same way as @Autowired.
+
+=== Classpath Scanning and Managed Components
+1.10 ...
