@@ -71,19 +71,27 @@ public class DispatcherServletInitializer extends AbstractAnnotationConfigDispat
 [blue white-background]#AbstractAnnotationConfigDispatcherServletInitializer# will initialize both [blue white-background]#DispatcherServlet# and [blue white-background]#ContextLoaderListener#.
 
 === Root Application Context
+Root application context is the parent context of Web Application Context, which manages beans shared by all the servlets. In other words, the beans in the root application context are used by the entire web application.
+
+Web application context is the child context of the root application context. It has all the beans used by a particular DispatcherServlet.
+
+If the application is simple and there are not so many beans, then one web application context might be enoguh. In this case, there is no need to create a root application context.
+
 [source,java]
 ----
 @Configuration
 @ComponentScan(basePackages = {
         "y.w.webapp.model",                     // <1>
         "y.w.webapp.security",                  // <2>
+        "y.w.webapp.service",                   // <3>
 })
 public class RootApplicationContext
 {
 }
 ----
-<1> Scan the components for models
-<2> Scan the components for security configurations
+<1> Scan the components for models.
+<2> Scan the components for security configurations.
+<3> Scan the components for services.
 
 === Web Application Context
 [source,java]
@@ -93,7 +101,6 @@ public class RootApplicationContext
 @ComponentScan(basePackages = {                                   // <2>
         "y.w.webapp.controller",
         "y.w.webapp.validator",
-        "y.w.webapp.service",
 })
 public class WebApplicationContextConfig implements WebMvcConfigurer  // <3>
 {
@@ -203,6 +210,12 @@ public class WebApplicationContextConfig implements WebMvcConfigurer  // <3>
   </servlet-mapping>
 </web-app>
 ----
+
+ContextLoaderListener does the following:
+. tie the lifecycle of the application context to the lifecycle of ServletContext.
+. automate the creation of the application context so you don't have to write explicit code to create it. It's a convenience function.
+
+ServletContextListener creates WebApplicationContext, which provides access to the ServletContext if it is ServletContextAware.
 
 == Exception Handlers
 === Exception Handlers as Controller Advice

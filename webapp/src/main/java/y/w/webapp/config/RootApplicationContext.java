@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan(basePackages = {
         "y.w.webapp.model",
+        "y.w.webapp.service",
         "y.w.webapp.security",
 })
 public class RootApplicationContext

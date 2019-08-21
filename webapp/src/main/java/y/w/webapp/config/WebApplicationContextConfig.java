@@ -37,7 +37,6 @@ import y.w.webapp.security.WebSecurityConfig;
 @ComponentScan(basePackages = {
         "y.w.webapp.controller",
         "y.w.webapp.validator",
-        "y.w.webapp.service",
 })
 public class WebApplicationContextConfig implements WebMvcConfigurer
 {
