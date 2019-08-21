@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 == Configuration Metadata
 Configuration metadata instructing Spring IoC container how to instatiate, configure and assemble the objects.
@@ -448,3 +448,56 @@ public class AppConfig extends WebMvcConfigurerAdapter {
     }
 }
 ....
+
+See a test y.w.spring.context.SpringApplicationContextTest in springtest project.
+
+==== Custom Scopes
+The scope can be customized as well.
+
+== Customizing the Nature of Bean
+=== Lifecycle Callbacks
+The bean can implement certain interfaces to join the bean lifecycle.
+
+. Initializing callback: InitializingBean - method afterPropertiesSet()
+. Destruction callback: DisposableBean - method destroy()
+
+Alternatively, add methods init(), dispose(), or destroy() and specify these methods in the bean definitions.
+
+....
+<bean id="customerService" class="y.w.CustomerService"
+    init-method="initIt" destroy-method="cleanUp">
+    <property name="message" value="someValue" />
+</bean>
+....
+
+Alternatively, annotated methods with the following annotations:
+. @PostConstruct
+. @PreDestroy
+
+....
+public class CachingMovieLister {
+    @PostConstruct
+    public void populateMovieCache() {
+        // populates the movie cache upon initialization...
+    }
+    @PreDestroy
+    public void clearMovieCache() {
+        // clears the movie cache upon destruction...
+    }
+}
+....
+
+=== Aware Interfaces
+. ApplicationContextAware
+. ApplicationEventPublisherAware
+. BeanClassLoaderAware
+. BeanFactoryAware
+. BeanNameAware
+. BootstrapContextAware
+. LoadTimeWeaverAware
+. MessageSourceAware
+. NotficationPublisherAware
+. ResourceLoaderAware
+. ServletConfigAware
+. ServletContextAware
+
