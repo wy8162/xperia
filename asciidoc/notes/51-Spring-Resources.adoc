@@ -1,0 +1,28 @@
+= Spring Framework Resources
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+Spring's Resource interface is meant to be a more capable interface for abstracting access to low level resources.
+
+....
+public interface Resource extends InputStreamSource {
+    boolean exists();
+    boolean isOpen();
+    URL getURL() throws IOException;
+    File getFile() throws IOException;
+    Resource createRelative(String relativePath) throws IOException;
+    String getFilename();
+    String getDescription();
+}
+....
+
+== Built-in Resources
+* UrlResource
+* ClassPathResource
+* FileSystemResource
+* ServletContextResource
+* InputStreamResource
+* ByteArrayResource
+

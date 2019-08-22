@@ -1,4 +1,4 @@
-= Spring Framework Study Notes.
+= Spring Framework IoC Container
 :sectnums:
 :toc:
 :toclevels: 4
@@ -720,4 +720,261 @@ Starting with Spring 3.0, Spring offers support for JSR-330 standard annotations
 |===
 
 === Java-based Container Configuration
+* @Bean - it is used to indicate that a method instantiates, configures, and initializes a new object to be managed by the Spring IoC container.
+* @Bean can be used to annotate any methods with any Spring @Component. However, they are most often used with @Configuration beans.
+* @Configuration - annotating a class with @Configuration indicates that its primary purpose is as a source of bean definitions.
+* @Configuration classes let inter-bean dependencies be defined by calling other @Bean methods in the same class.
 
+* Full mode - @Bean in a @Configuration class is called a full mode. Inter-bean dependencies are allowed in full mode.
+* Lite mode - @Bean in non-@Configuration class is called a lite mode. In such scenarios, @Bean methods are a general-purpose factory method mechanism, without any special runtime semantics - no CFLIB subclassing is applied.
+
+==== Instantiating Spring Container with AnnotationConfigApplicationContext
+AnnotationConfigApplicationContext can accept not only classes annotated with @Configuration but also plain @Component classes annotated with some JSR-330 metadata.
+
+* When @Configuration classes are provided as input, the @Configuration class itself is registered as a bean definition and all declared @Bean methods within the class are also registered as bean definitions.
+
+* When @Component and JSR-330 classes are provided, they are registered as bean definitions, and it is assumed that DI metadata such as @Autowired or @Inject are used within those classes where necessary.
+
+As mentioned earlier, AnnotationConfigApplicationContext is not limited to working only with @Configuration classes. Any @Component or JSR-330 annotated class may be supplied as input to the constructor, as the following example shows:
+
+....
+ApplicationContext ctx = new AnnotationConfigApplicationContext(
+    MyServiceImpl.class,
+    Dependency1.class,              // <1>
+    Dependency2.class);
+....
+<1> Dependencies might be @Component which has annotations as @Autowired.
+
+===== Building the comtainer programatically:
+....
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+    ctx.register(AppConfig.class, OtherConfig.class);
+    ctx.register(AdditionalConfig.class);
+    ctx.refresh();
+    MyService myService = ctx.getBean(MyService.class);
+    myService.doStuff();
+....
+
+===== Enable component scanning:
+....
+@Configuration
+@ComponentScan(basePackages = "com.acme")
+public class AppConfig  {
+    ...
+}
+....
+
+or
+
+....
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+    ctx.scan("com.acme");
+....
+
+===== Support for Web Applications with AnnotationConfigWebApplicationContext
+A WebApplicationContext variant of AnnotationConfigApplicationContext is available with AnnotationConfigWebApplicationContext. You can use this implementation when configuring the Spring ContextLoaderListener servlet listener, Spring MVC DispatcherServlet, and so forth.
+
+*Configuring a typical web applicaiton*
+[source,xml]
+----
+<web-app>
+    <!-- Configure ContextLoaderListener to use AnnotationConfigWebApplicationContext
+        instead of the default XmlWebApplicationContext -->
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>
+            org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+        </param-value>
+    </context-param>
+
+    <!-- Configuration locations must consist of one or more comma- or space-delimited
+        fully-qualified @Configuration classes. Fully-qualified packages may also be
+        specified for component-scanning -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>com.acme.AppConfig</param-value>
+    </context-param>
+
+    <!-- Bootstrap the root application context as usual using ContextLoaderListener -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- Declare a Spring MVC DispatcherServlet as usual -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- Configure DispatcherServlet to use AnnotationConfigWebApplicationContext
+            instead of the default XmlWebApplicationContext -->
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>
+                org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+            </param-value>
+        </init-param>
+        <!-- Again, config locations must consist of one or more comma- or space-delimited
+            and fully-qualified @Configuration classes -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>com.acme.web.MvcConfig</param-value>
+        </init-param>
+    </servlet>
+
+    <!-- map all requests for /app/* to the dispatcher servlet -->
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+----
+
+==== Using @Bean Annotation
+To declare a bean, you can annotate a method with @Bean. The bean name will be the same as the method name.
+
+* @Bean is used on method to register a bean with ApplicationContext. The bean name is the same as the method name.
+* @Bean-annotated method can have arbitrary number of arguments that describes the dependencies required to build that bean. The resolution mechanism is pretty much the same as constructor based dependency injection.
+
+===== Defining Init and Destroy Methods
+....
+@Configuration
+public class AppConfig {
+    @Bean(initMethod = "init", destroyMethod = "cleanup")
+    public BeanOne beanOne() {
+        return new BeanOne();
+    }
+}
+....
+
+[NOTE]
+====
+If a bean has public close() and shutdown() methods, they will be ,[blue white-background]#automatically enlisted# as init and destroy methods.
+
+Or, [blue white-background]#@Bean(destroyMethod="")# will disable this feature.
+====
+
+===== @Scope, Scoped-Proxy and Description
+....
+@Configuration
+public class ChildContextConfig
+{
+    @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "prototype")    <1>
+    public TestBeans.ScopedBean scopedBean()
+    {
+        return new TestBeans.ScopedBean();
+    }
+
+    @Bean({"dataSource", "subsystemA-dataSource", "subsystemB-dataSource"})  <2>
+    @Description("Provides a basic example of a bean")                       <3>
+    @Scope("prototype")                                                      <4>
+    public DataSource dataSource() {
+        // instantiate, configure and return DataSource bean...
+    }
+}
+....
+<1> Specify scope and proxy
+<2> Specify aliases
+<3> Add description
+<4> Scopes the bean
+
+===== Composing Java-based Configurations - @Import & @ImportResource
+....
+@Configuration
+@Import({ServiceConfig.class, RepositoryConfig.class})                      <1>
+@ImportResource("classpath:/y/w/bean-config.xml")                           <2>
+public class SystemTestConfig {
+    @Bean
+    public DataSource dataSource() {
+        // return new DataSource
+    }
+}
+....
+<1> Import other Java configurations.
+<2> Import bean definitions from XML format.
+
+== Environment Abstraction
+
+The Environment interface is an abstraction integrated in the container that models two key aspects of the application environment: [blue white-background]#profiles# and [blue white-background]#properties#.
+
+=== @Profile
+....
+@Configuration
+public class AppConfig {
+    @Bean("dataSource")
+    @Profile("production")
+    public DataSource jndiDataSource() throws Exception {
+    }
+}
+
+Or
+
+<beans profile="production" ...>
+    <jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/datasource"/>
+</beans>
+....
+
+=== @PropertySource
+....
+@Configuration
+@PropertySource("classpath:/com/myco/app.properties")                            <1>
+public class AppConfig {
+}
+....
+<1> Load properties from a properties file.
+
+....
+@Configuration
+@PropertySource("classpath:/com/${my.placeholder:default/path}/app.properties")  <1>
+public class AppConfig {
+    @Autowired
+    Environment env;
+
+    @Bean
+    public TestBean testBean() {
+        TestBean testBean = new TestBean();
+        testBean.setName(env.getProperty("testbean.name"));
+        return testBean;
+    }
+}
+....
+<1> Placeholder ${...} is resolved with properties already loaded.
+
+=== Placeholder Resolution
+[NOTE]
+====
+Placeholder ${customer}
+
+<beans>
+<import resource="com/bank/service/${customer}-config.xml"/>
+</beans>
+====
+
+== BeanFactory vs ApplicationContext
+
+|===
+|HFeature |BeanFactory |ApplicationContext
+
+|Bean instantiation/wiring
+|Yes
+|Yes
+
+|Integrated lifecycle management
+|No
+|Yes
+
+|Automatic BeanPostProcessor registration
+|No
+|Yes
+
+|Automatic BeanFactoryPostProcessor registration
+|No
+|Yes
+
+|Convenient MessageSource access (for internalization)
+|No
+|Yes
+
+|Built-in ApplicationEvent publication mechanism
+|No
+|Yes
+|===

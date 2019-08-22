@@ -1,0 +1,248 @@
+= Spring Framework - Validation, Data Binding, and Type Conversion
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+* Data Binding - Data binding is useful for letting user input be dynamically bound to the domain model of an application (or whatever objects you use to process user input). Spring provides the aptly named DataBinder to do exactly that.
+* The BeanWrapper is a fundamental concept in the Spring Framework and is used in a lot of places.
+
+Spring’s DataBinder and the lower-level BeanWrapper both use PropertyEditorSupport implementations to parse and format property values.
+
+The PropertyEditor and PropertyEditorSupport types are part of the JavaBeans specification and are also explained in this chapter. Spring 3 introduced a core.convert package that provides a general type conversion facility, as well as a higher-level “format” package for formatting UI field values.
+
+[NOTE]
+====
+Spring supports the following validations:
+
+. Bean Validation 1.0 (JSR-303)
+. Bean Validation 1.1 (JSR-349)
+====
+
+== Spring Validator Interface
+Spring features a Validator interface that you can use to validate objects. The Validator interface works by using an Errors object so that, while validating, validators can report validation failures to the [blue white-background]#Errors# object.
+
+[NOTE]
+====
+Domain Object
+....
+public class Person {
+    private String name;
+    private int age;
+}
+....
+====
+
+[NOTE]
+====
+Validator
+....
+public class PersonValidator implements Validator {
+    /**
+     * This Validator validates *only* Person instances
+     */
+    public boolean supports(Class clazz) {
+        return Person.class.equals(clazz);
+    }
+
+    public void validate(Object obj, Errors e) {
+        ValidationUtils.rejectIfEmpty(e, "name", "name.empty");          <1>
+        Person p = (Person) obj;
+        if (p.getAge() < 0) {
+            e.rejectValue("age", "negativevalue");
+        } else if (p.getAge() > 110) {
+            e.rejectValue("age", "too.darn.old");
+        }
+    }
+}
+....
+====
+<1> reject the name property if it is null or empty.
+
+== Built-in PropertyEditor
+.Built-in PropertyEditor
+[width="90%",cols="30%,70%",align="left",options="header"]
+|===
+|Class |Explanation
+
+|ByteArrayPropertyEditor
+|Editor for byte arrays. Converts strings to their corresponding byte representations. Registered by default by BeanWrapperImpl.
+
+|ClassEditor
+|Parses Strings that represent classes to actual classes and vice-versa. When a class is not found, an IllegalArgumentException is thrown. By default, registered by BeanWrapperImpl.
+
+|CustomBooleanEditor
+|Customizable property editor for Boolean properties. By default, registered by BeanWrapperImpl but can be overridden by registering a custom instance of it as a custom editor.
+
+|CustomCollectionEditor
+|Property editor for collections, converting any source Collection to a given target Collection type.
+
+|CustomDateEditor <1>
+|Customizable property editor for java.util.Date, supporting a custom DateFormat. [blue white-background]#NOT registered by default#. Must be user-registered with the appropriate format as needed.
+
+|CustomNumberEditor
+|Customizable property editor for any Number subclass, such as Integer, Long, Float, or Double. By default, registered by BeanWrapperImpl but can be overridden by registering a custom instance of it as a custom editor.
+
+|FileEditor
+|Resolves strings to java.io.File objects. By default, registered by BeanWrapperImpl.
+
+|InputStreamEditor
+|One-way property editor that can take a string and produce (through an intermediate ResourceEditor and Resource) an InputStream so that InputStream properties may be directly set as strings. Note that the default usage does not close the InputStream for you. By default, registered by BeanWrapperImpl.
+
+|LocaleEditor
+|Can resolve strings to Locale objects and vice-versa (the string format is [country][variant], same as the toString() method of Locale). By default, registered by BeanWrapperImpl.
+
+|PatternEditor
+|Can resolve strings to java.util.regex.Pattern objects and vice-versa.
+
+|PropertiesEditor
+|Can convert strings (formatted with the format defined in the javadoc of the java.util.Properties class) to Properties objects. By default, registered by BeanWrapperImpl.
+
+|StringTrimmerEditor
+|Property editor that trims strings. Optionally allows transforming an empty string into a null value. NOT registered by default — must be user-registered.
+
+|URLEditor
+|Can resolve a string representation of a URL to an actual URL object. By default, registered by BeanWrapperImpl.
+|===
+<1> The CustomDateEditor NOT registered by default. That might be why I got issues converting string to date.
+
+== Custom PropertyEditor
+* Spring uses [blue white-background]#PropertyEditorManager# to set search path for property editors.
+* Java standard is the search for PropertyEditor in the same package of the bean.
+
+[NOTE]
+====
+Java will automatically find the PropertyEditor below for class People. The name of the property editor follow the pattern: [blue white-background]#<class name>Editor#.
+
+....
+y.w.model.People                <1>
+y.w.model.PeopleEditor          <2>
+....
+<1> Model class People is in package "y.w.model"
+<2> The property editor PeopleEditor is in the same package and the name having class name as prefix and Editor as suffix.
+====
+
+=== Sample for Custom Property Editor
+We have the following two classes ExoticType and DependsOnExoticType.
+[source,java]
+----
+package y.w.spring.propertyeditor;
+public class ExoticType
+{
+    private String name;
+}
+----
+[source,java]
+----
+package y.w.spring.propertyeditor;
+public class DependsOnExoticType
+{
+    private ExoticType type;                      // <1>
+    private Date       date;                      // <2>
+}
+----
+<1> Spring needs an Editor to convert String to ExoticType.
+<2> Spring needs an Editor to convert String to Date.
+
+[source,java]
+----
+package y.w.spring.propertyeditor;
+@Log4j
+public class ExoticTypeEditor extends PropertyEditorSupport  // <1>
+{
+
+    public void setAsText(String text) {
+        log.info("ExoticTypeEditor is automatically used by Java");
+        setValue(new ExoticType(text.toUpperCase()));
+    }
+}
+----
+<1> This custom Editor ExoticTypeEditor for ExoticType is in the same package of ExoticType. So it will be used by Java automatically.
+
+[source,java]
+----
+@Log4j
+public class CustomDateEditor extends PropertyEditorSupport             // <1>
+{
+    public void setAsText(String text)
+    {
+        try
+        {
+            log.info("CustomDateEditor is called to convert String to Date.");
+            setValue(new SimpleDateFormat("yyyy-mm-dd").parse(text));
+        }
+        catch (ParseException e)
+        {
+            setValue(null);
+        }
+    }
+}
+----
+<1> CustomDateEditor will convert String to Date. It can't be in the same package of Date. So we need to register it with Spring so that it can be used.
+
+[source,java]
+----
+public class CustomDateEditorRegistrar implements PropertyEditorRegistrar   // <1>
+{
+    @Override public void registerCustomEditors(PropertyEditorRegistry registry)
+    {
+        registry.registerCustomEditor(Date.class, new CustomDateEditor());
+    }
+}
+----
+<1> A registrar for CustomDateEditor is needed to register it with Spring.
+
+The next is to inject an instance of CustomDateEditorRegistrar to Spring CustomEditorConfigurer. We can do this with XML format:
+
+[source,xml]
+----
+<beans>
+    <!-- Inject an instance of our CustomDateEditorRegistrar into CustomEditorConfigurer -->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+            <list>
+                <ref bean="customPropertyEditorRegistrar"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Bean for our CustomDateEditorRegistrar -->
+    <bean id="customPropertyEditorRegistrar"
+          class="y.w.spring.propertyeditor.CustomDateEditorRegistrar"/>
+</beans>
+----
+
+The following test will pass easily
+[source,java]
+----
+public class PropertyEditorTest
+{
+    @Test
+    public void propertyEditorTest()
+    {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring/propertyEditor-beans.xml");
+
+        DependsOnExoticType bean = ctx.getBean("sample", DependsOnExoticType.class);
+    }
+}
+----
+
+==== Alternate Way to Register Custom Property Editor
+The CustomDateEditor can be registered without a Registrar. This is simpler.
+
+[source,xml]
+----
+<beans>
+    <!-- Inject an instance of our CustomDateEditorRegistrar into CustomEditorConfigurer -->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="java.util.Date" value="y.w.spring.propertyeditor.CustomDateEditor"/>
+            </map>
+        </property>
+    </bean>
+</beans>
+----
+
+== Spring Type Conversion
+3.4
