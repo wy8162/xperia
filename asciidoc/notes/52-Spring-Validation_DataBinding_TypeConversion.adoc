@@ -233,7 +233,7 @@ The CustomDateEditor can be registered without a Registrar. This is simpler.
 [source,xml]
 ----
 <beans>
-    <!-- Inject an instance of our CustomDateEditorRegistrar into CustomEditorConfigurer -->
+    <!-- Add CustomDateEditor to CustomEditorConfigurer -->
     <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
         <property name="customEditors">
             <map>
@@ -245,4 +245,136 @@ The CustomDateEditor can be registered without a Registrar. This is simpler.
 ----
 
 == Spring Type Conversion
-3.4
+* Started with Spring 3
+* Package core.convert
+* Alternative to PropertyEditor to convert externalized bean property value strings to the required property types.
+* SPI pattern
+
+=== Converter Interface
+....
+package org.springframework.core.convert.converter;
+public interface Converter<S, T> {                     // <1>
+    T convert(S source);
+}
+....
+<1> S is the target type and T is the source type.
+
+=== ConverterFactory
+....
+package org.springframework.core.convert.converter;
+public interface ConverterFactory<S, R> {
+    <T extends R> Converter<S, T> getConverter(Class<T> targetType);  // <1>
+}
+....
+<1> Parameterize S to be the type you are converting from and R to be the base type defining the range of classes you can convert to. Then implement getConverter(Class<T>), where T is a subclass of R.
+
+[NOTE]
+====
+....
+final class StringToEnumConverterFactory
+    implements ConverterFactory<String, Enum>
+    {
+        public <T extends Enum> Converter<String, T> getConverter(Class<T> targetType)
+        {
+            return new StringToEnumConverter(targetType);
+        }
+
+    private final class StringToEnumConverter<T extends Enum> implements Converter<String, T>
+    {
+        private Class<T> enumType;
+        public StringToEnumConverter(Class<T> enumType) {
+            this.enumType = enumType;
+        }
+
+        public T convert(String source) {
+            return (T) Enum.valueOf(this.enumType, source.trim());
+        }
+    }
+}
+....
+====
+=== GenericConverter
+When you require a sophisticated Converter implementation, consider using the GenericConverter interface. With a more flexible but less strongly typed signature than Converter, a GenericConverter supports converting between multiple source and target types. In addition, a GenericConverter makes available source and target field context that you can use when you implement your conversion logic. Such context lets a type conversion be driven by a field annotation or by generic information declared on a field signature.
+
+[NOTE]
+====
+Because GenericConverter is a more complex SPI interface, you should use it only when you need it. Favor Converter or ConverterFactory for basic type conversion needs.
+====
+
+=== Using ConversionService Programatically
+....
+@Service
+public class MyService {
+    @Autowired
+    public MyService(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    public void doIt() {
+        this.conversionService.convert("source", TargetType.class);
+    }
+}
+....
+
+==== Samples Using Converter and ConverterFactory
+See project springtest/conversion.
+
+== Spring Field Formatting
+Spring core.convert type conversion system - [blue white-background]#ConversionService API & Converter SPI#:
+
+* [blue white-background]#General purpose# type conversion system
+* Unified ConversionService API
+* Strongly typed Converter API
+* Used to bind bean property values
+* SpEL uses it to bind field values
+* DataBinder uses it to bind field values
+
+In the case of client environment like web application, [blue white-background]#Fomatter SPI#.
+
+=== Formatter SPI
+
+Formatter Interface definition:
+....
+package org.springframework.format;
+public interface Formatter<T> extends Printer<T>, Parser<T> {
+}
+....
+
+Building block interfaces:
+....
+public interface Printer<T> {
+    String print(T fieldValue, Locale locale);
+}
+....
+
+....
+import java.text.ParseException;
+
+public interface Parser<T> {
+    T parse(String clientValue, Locale locale) throws ParseException;
+}
+....
+
+Follow the guides below to implement Formatter Interface
+
+* Throw either ParseException or IllegalArgumentException if a parse attempt fails.
+* Formatter needs to be thread safe.
+
+=== Annotation-driven Formatting
+To bind an annotation to a Formatter, implement the AnnotationFormatterFactory:
+
+....
+package org.springframework.format;
+
+public interface AnnotationFormatterFactory<A extends Annotation> {  // <1>
+    Set<Class<?>> getFieldTypes();                                   // <2>
+    Printer<?> getPrinter(A annotation, Class<?> fieldType);         // <3>
+    Parser<?> getParser(A annotation, Class<?> fieldType);           // <4>
+}
+....
+<1> A - the field annotation type, with which to associate the formatting logic
+<2> Types of fields on which annotation can be used.
+<3> Return a Printer to print the value of an annotated field.
+<4> Return a Parser to parse client value for an annotated field.
+
+
