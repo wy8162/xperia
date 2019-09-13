@@ -1,0 +1,136 @@
+= Java Performance
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+== Performance Tuning Tips
+
+. Don't optimize before you know it's necessary::
+* Follow best practices to implement use cases efficiently.
+* Premature optimization takes up a lot of time and makes the code hard to read and maintain.
+* It's waste of time optimizing non-critical parts of applications.
+* Define KPI like Response Per Second (RPS), TPS (Transactions Per Seconf) before optimization.
+* Measure which parts of applications need improve.
+
+. Use Profiler to find the real bottlenet::
+* Based on findings from #1, decide where to start.
+** Review the source code.
+** Use Profiler to get details about the behavior and performance of each part of the code.
+** Focus on the most critical parts first.
+
+. Create a performance test suite for the whole application
+* Define a test performance suite.
+* Always run the suite before and after performance improvement.
++
+These tests will help identify the functional and performance side effects after changes.
+
+. Work on the biggest bottleneck first::
+Rather than being tempted to start with quick wins, start from the most significant performance first.
+
+. Use StringBuilder to programmatically add new contents to String::
+* Better performance than StringBuffer
+* But #not thread safe#
+
+. Use "+" to concatenate Strings in one statements
+* Strings are immutable
+* Compiler will optimize String concatenate like "A" + "B" + "C".
+
+. Use Primitives where possible::
+* Less memory and faster
+
+. Try to avoid BigInteger and BigDecimal
+* Occupies more memory and slower than primitives
+
+. Use the right log level
+* Avoid creating String messages which ends up being ignored.
++
+Do this: `if (log.isDebugEnabled()) {....}`
+
+. Use Apache StringUtils.replace instead of String.replace because Apache has better performance.::
+
+. Cache expensive resources like database connections::
+
+. Use laziness if possible::
+
+. Optimize database SQLs::
+* Efficient execution of SQLs.
+* Use hints.
+* Use placeholders for parameters so that SQLs can be precompiled.
+* Use stored procedures if possible.
+* Retrieve data needed.
+* Avoid race condition and dead lock.
+* Don't lock if it is read only operation.
+* Be cautious whenever run SQL using DISTINCT key word.
+* Understand the indexes created on the table. Avoid #full table# scan.
+*
+
+. Scale out via process model::
+
+. Multithreading::
+* Use the full power and capacity allowed
+* Avoid dead lock or race condition - Race conditions occurs when 2 or more threads operate on same object without proper synchronization and the steps on the operation interleaves on other thread.
+* Avoid starvation - When a thread is not granted CPU time because other threads were using it all, it is called starvation.
+
+. Fine tuning JVM parameters::
+* Memory usage.
+* Garbage collection algorithms.
+
+== Tuning Performance Architecturally
+Key areas to look at::
+. UI server being deployed separately
+. Cluster of servers
+. Backup and load balance for better performance and reliability
+. Prefer scaling out to scaling up
+
+Performance test to collect data::
+. CPU usage on application server and database
+. Network utilization and latency
+. Storage load
+. Database AWR report
+. Java Garbage Collection statistics
+. System throughput numbers
+. Java thread dumps
+. Oracle error log
+
+== 12 Factor Application
+[cols="2,4"]
+|===
+|Factor | Description
+|I. Codebase
+|One codebase tracked in revision control, many deploys
+
+|II. Dependencies
+|Explicitly declare and isolate dependencies
+
+|III. Config
+|Store config in the environment
+
+|IV. Backing services
+|Treat backing services as attached resources
+
+|V. Build, release, run
+|Strictly separate build and run stages
+
+|VI. Processes
+|Execute the app as one or more stateless processes
+
+|VII. Port binding
+|Export services via port binding
+
+|VIII. Concurrency
+|Scale out via the process model
+
+|IX. Disposability
+|Maximize robustness with fast startup and graceful shutdown
+
+|X. Dev/prod parity
+|Keep development, staging, and production as similar as possible
+
+|XI. Logs
+|Treat logs as event streams
+
+|XII. Admin processes
+|Run admin/management tasks as one-off processes
+|===
+

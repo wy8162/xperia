@@ -1,0 +1,26 @@
+= Spring Framework - Testing
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+Spring test annotations:
+
+. @BootstrapWith
+. @ContextConfiguration
+. @WebAppConfiguration
+. @ContextHierarchy
+. @ActiveProfiles
+. @TestPropertySource
+. @DirtiesContext
+. @TestExecutionListeners
+. @Commit
+. @Rollback
+. @BeforeTransaction
+. @AfterTransaction
+. @Sql
+. @SqlConfig
+. @SqlGroup
+
+3.5. Spring TestContext Framework
+

@@ -377,4 +377,131 @@ public interface AnnotationFormatterFactory<A extends Annotation> {  // <1>
 <3> Return a Printer to print the value of an annotated field.
 <4> Return a Parser to parse client value for an annotated field.
 
+See springtest project for Annotation-based Formatter in package formatter.
+
+=== The FormatterRegistry SPI
+The FormatterRegistry is an SPI for registering formatters and converters. FormattingConversionService is an implementation of FormatterRegistry suitable for most environments. You can programmatically or declaratively configure this variant as a Spring bean, e.g. by using FormattingConversionServiceFactoryBean. Because this implementation also implements ConversionService, you can directly configure it for use with Spring’s DataBinder and the Spring Expression Language (SpEL).
+
+....
+package org.springframework.format;
+public interface FormatterRegistry extends ConverterRegistry {
+    void addFormatterForFieldType(Class<?> fieldType, Printer<?> printer, Parser<?> parser);
+    void addFormatterForFieldType(Class<?> fieldType, Formatter<?> formatter);
+    void addFormatterForFieldType(Formatter<?> formatter);
+    void addFormatterForAnnotation(AnnotationFormatterFactory<?, ?> factory);
+}
+....
+
+=== The FormatterRegistrar SPI
+FormatterRegistrar is an SPI for registering formatters and converters through the FormatterRegistry. The following listing shows its interface definition:
+
+....
+package org.springframework.format;
+public interface FormatterRegistrar {
+    void registerFormatters(FormatterRegistry registry);
+}
+....
+
+=== Configuring Global Date and Time Format
+By default, [blue white-background]#date and time fields# that are not annotated with @DateTimeFormat are converted from strings by using the [blue white-background]#DateFormat.SHORT# style. If you prefer, you can change this by defining your own global format.
+
+To register  your own global format, you need to ensure that Spring does not register default formatters. Instead, you should register all formatters manually. Use the [blue white-background]#org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar# or [blue white-background]#org.springframework.format.datetime.DateFormatterRegistrar# class, depending on whether you use the Joda-Time library.
+
+For example, the following Java configuration registers a global yyyyMMdd format:
+....
+@Configuration
+public class AppConfig {
+    @Bean
+    public FormattingConversionService conversionService() {
+
+        // Use the DefaultFormattingConversionService but do not register defaults
+        DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService(false);
+
+        // Ensure @NumberFormat is still supported
+        conversionService.addFormatterForFieldAnnotation(new NumberFormatAnnotationFormatterFactory());
+
+        // Register date conversion with a specific global format
+        DateFormatterRegistrar registrar = new DateFormatterRegistrar();
+        registrar.setFormatter(new DateFormatter("yyyyMMdd"));
+        registrar.registerFormatters(conversionService);
+
+        return conversionService;
+    }
+}
+....
+
+
+== Spring Validation
+Spring fully supports JSR-303 Bean Validation API. By using this API, you annotate domain model properties with declarative validation constraints and the runtime enforces them. Built-in and custom constraints are both supported.
+
+* Step 1 - Annotate domain model with constraints
+....
+public class PersonForm {
+    @NotNull
+    @Size(max=64)
+    private String name;
+
+    @Min(0)
+    private int age;
+}
+....
+Annotate the properties with JSR-303 annotation constraints.
+
+* Step 2 - Configuring Bean Validation Provider
+There are a few options to do this.
+
+- Using LocalValidatorFactoryBean in XML configuration.
+....
+<bean id="validator"
+    class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+....
+The basic configuration in the preceding example triggers bean validation to initialize by using its default bootstrap mechanism. A JSR-303 or JSR-349 provider, such as the Hibernate Validator, is expected to be present in the classpath and is automatically detected.
+
+LocalValidatorFactoryBean implements both javax.validation.ValidatorFactory and javax.validation.Validator, as well as Spring’s org.springframework.validation.Validator
+
+- Injecting Validator
+....
+import javax.validation.Validator; // <1>
+
+@Service
+public class MyService {
+    @Autowired
+    private Validator validator;
+....
+<1> Uses javax.validation.Validator
+
+Or
+
+....
+import org.springframework.validation.Validator; // <1>
+
+@Service
+public class MyService {
+
+    @Autowired
+    private Validator validator;
+}
+....
+<1> Uses org.springframework.validation.Validator
+
+=== Using DataBinder
+DataBinder is considered a higher level alternative to BeanWrapperImpl.
+
+There is one sample in project springtest/formatter.
+
+....
+Foo target = new Foo();
+DataBinder binder = new DataBinder(target);
+binder.setValidator(new FooValidator());
+
+// bind to the target object
+binder.bind(propertyValues);
+
+// validate the target object
+binder.validate();
+
+// get BindingResult that includes any validation errors
+BindingResult results = binder.getBindingResult();
+....
+
 

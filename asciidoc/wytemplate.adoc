@@ -11,7 +11,23 @@ This is all about SEPA Integration Test
 :keywords: AsciiDoc
 :imagesdir: ./img
 
-SEPA compliance tests include both outbound and inbound tests.
+SEPA `compliance tests` include #both# outbound and inbound tests.
+
+.Formated Text
+
+bold *constrained* & **un**constrained
+
+italic _constrained_ & __un__constrained
+
+bold italic *_constrained_* & **__un__**constrained
+
+monospace `constrained` & ``un``constrained
+
+monospace bold `*constrained*` & ``**un**``constrained
+
+monospace italic `_constrained_` & ``__un__``constrained
+
+monospace bold italic `*_constrained_*` & ``**__un__**``constrained
 
 == Inbound
 Yang Wang <yang.wang1@fiserv.com>
@@ -27,7 +43,7 @@ The purpose of this work order is to backport the changes we made for SEPA Compl
 .. Inbound from ESC
 
 
-[cols=4*]
+[cols="2,2,2,4a"]
 |===
 |Header 1 |Header 2 |Header 3 |Header 4
 
@@ -36,20 +52,8 @@ The purpose of this work order is to backport the changes we made for SEPA Compl
 |Column 3, row 1
 |Column 4, row 1
 
-|Column 1, row 2
-|Column 2, row 2
-|Column 3, row 2
-|Column 4, row 2
-
-|Column 1, row 3
-|Column 2, row 3
-|Column 3, row 3
-|Column 4, row 3
-
-|Column 1, row 4
-|Column 2, row 4
-|Column 3, row 4
-|Column 4, row 4
+* List item1
+* List item2
 
 |ISO20022
 |SEPA Compliance
@@ -81,16 +85,67 @@ Think of c1..c2 as _all commits as of c1 (not including c1) until commit
 c2.
 ====
 
+TIP: another TIP
+
 [WARNING]
 ====
 This is a warning
 ====
+
+WARNING: another warning
 
 .My header for the note
 [NOTE]
 ====
 Blabla
 ====
+
+NOTE: another note
+
+IMPORTANT: this is important stuffs
+
+.Unordered List
+* 1
+** 1.1
+* 2
+** 2.2
+
+.Ordered List
+. 1
+.. 1.1
+
+//- serves as end of list
+
+. 2
+.. 2.1
+
+//-
+
+CPU:: The brain of the computer.
+Hard drive:: Permanent storage for operating system and/or user files.
+RAM:: Temporarily stores information the CPU uses during operation.
+Keyboard:: Used to enter text or control items on the screen.
+Mouse:: Used to point to and select items on your computer screen.
+Monitor:: Displays information in visual form using text and graphics.
+
+Operating Systems::
+Linux:::
+. Fedora
+* Desktop
+. Ubuntu
+* Desktop
+* Server
+BSD:::
+. FreeBSD
+. NetBSD
+
+Cloud Providers::
+PaaS:::
+. OpenShift
+. CloudBees
+IaaS:::
+. Amazon EC2
+. Rackspace
 
 == Reference
 

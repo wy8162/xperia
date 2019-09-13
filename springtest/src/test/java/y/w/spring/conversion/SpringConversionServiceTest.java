@@ -19,13 +19,6 @@ public class SpringConversionServiceTest
     @Test
     public void conversionServiceTest() throws IOException
     {
-//        DefaultConversionService service = new DefaultConversionService();
-//        service.addConverter(new ZonedDateTimeConverter());
-//        service.addConverter(new RankingConverter());
-//        service.addConverterFactory(new EntityConverterFactory());
-//
-//        service.convert("{\"id\":\"1234\",\"customerName\":\"Jack\"}", Customer.class);
-
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ConversionBeanConfig.class);
 
         Order order = ctx.getBean("order", Order.class);

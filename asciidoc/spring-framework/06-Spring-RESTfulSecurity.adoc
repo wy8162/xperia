@@ -1,0 +1,326 @@
+= Spring RESTful Security
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+https://stackoverflow.com/questions/18205436/spring-mvc-spring-security-login-with-a-rest-web-service[Spring MVC + Spring Security login with a rest web service]
+
+https://stackoverflow.com/questions/20811581/spring-security-login-with-a-rest-web-service[Spring Security login with a rest web service]
+
+https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html[OWASP’s REST Security Cheat Sheet]
+
+https://stackoverflow.com/questions/20862299/with-spring-security-3-2-0-release-how-can-i-get-the-csrf-token-in-a-page-that[With Spring Security 3.2.0.RELEASE, how can I get the CSRF token in a page that is purely HTML with no tag libs]
+
+[source,xml]
+----
+<beans>
+    <http use-expressions="true" create-session="stateless" entry-point-ref="loginUrlAuthenticationEntryPoint"
+            authentication-manager-ref="customAuthenticationManager">
+        <custom-filter ref="restAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+        <custom-filter ref="restPreAuthFilter" position="PRE_AUTH_FILTER" />
+        <intercept-url pattern="/signin/**" access="permitAll" />
+        <intercept-url pattern="/img/**" access="permitAll" />
+        <intercept-url pattern="/css/**" access="permitAll" />
+        <intercept-url pattern="/js/**" access="permitAll" />
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+
+    </http>
+
+    <authentication-manager id="authManager" alias="authManager">
+        <authentication-provider ref="preauthAuthProvider" />
+    </authentication-manager>
+
+    <beans:bean id="restPreAuthFilter" class="com.company.CustomPreAuthenticatedFilter">
+        <beans:property name="cookieName" value="SessionCookie" />
+        <beans:property name="checkForPrincipalChanges" value="true" />
+        <beans:property name="authenticationManager" ref="authManager" />
+    </beans:bean>
+
+    <beans:bean id="preauthAuthProvider"
+        class="com.company.CustomPreAuthProvider">
+        <beans:property name="preAuthenticatedUserDetailsService">
+            <beans:bean id="userDetailsServiceWrapper"
+                class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+                <beans:property name="userDetailsService" ref="userDetailsService" />
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="userDetailsService" class="com.company.CustomUserDetailsService" />
+
+    <beans:bean id="loginUrlAuthenticationEntryPoint"
+        class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <beans:constructor-arg value="/signin" />
+    </beans:bean>
+
+    <beans:bean id="customAuthenticationManager"
+        class="com.company.CustomAuthenticationManager" />
+
+    <beans:bean id="restAuthenticationFilter"
+        class="com.company.CustomFormLoginFilter">
+        <beans:property name="filterProcessesUrl" value="/signin/authenticate" />
+        <beans:property name="authenticationManager" ref="customAuthenticationManager" />
+        <beans:property name="authenticationFailureHandler">
+            <beans:bean
+                class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <beans:property name="defaultFailureUrl" value="/login?login_error=t" />
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+</beans>
+----
+
+[source,java]
+----
+// Here, the idea is to write authenticate method and return a new UsernamePasswordAuthenticationToken
+public class CustomAuthenticationManager implements AuthenticationManager { ... }
+
+// Write attemptAuthentication method and return UsernamePasswordAuthenticationToken
+public class CustomFormLoginFilter extends UsernamePasswordAuthenticationFilter { ... }
+
+// Write getPreAuthenticatedPrincipal and getPreAuthenticatedCredentials methods and return cookieName and cookieValue respectively
+public class CustomPreAuthenticatedFilter extends AbstractPreAuthenticatedProcessingFilter { ... }
+
+// Write authenticate method and return Authentication auth = new UsernamePasswordAuthenticationToken(name, token, grantedAuths); (or null if can't be pre-authenticated)
+public class CustomPreAuthProvider extends PreAuthenticatedAuthenticationProvider{ ... }
+
+// Write loadUserByUsername method and return a new UserDetails user = new User("hectorg87", "123456", Collections.singletonList(new GrantedAuthorityImpl("ROLE_USER")));
+public class CustomUserDetailsService implements UserDetailsService { ... }
+----
+
+. You can define a custom pre-auth filter by extending AbstractPreAuthenticatedProcessingFilter.
+. In your implementation of getPreAuthenticatedPrincipal() method you can check if cookie exists and if it exists return cookie name is principal and cookie value in credentials.
+. Use PreAuthenticatedAuthenticationProvider and provide your custom preAuthenticatedUserDetailsService to check if cookie is vali, if its valid also fetch granted authorities else throw AuthenticationException like BadCredentialsException
+. For authenticating user using username/password, add a form-login filter, basic-filter or a custom filter with custom authentication provider (or custom userdetailsService) to validate user/password
+. In case cookie exists, pre auth filter will set authenticated user in springContext and your username./password filter will not be called, if cookie is misisng/invalid, authentication entry point will trigger the authentication using username/password
+
+[source,java]
+----
+public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        // get accept headers from request
+        // Redirect successfully logged in user to another url depending on the accept headers)
+        // put session id in response if needed
+        ((WebAuthenticationDetails)SecurityContextHolder.getContext().getAuthentication().getDetails()).getSessionId();
+        String targetUrl = ""; //TODO insert here
+        response.sendRedirect(targetUrl);
+    }
+}
+
+public class AuthenticationFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandler implements AuthenticationFailureHandler {
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        // get accept headers from request
+        // set failure url
+        // Do redirecting job
+        setDefaultFailureUrl(FAILURE_URL);
+        super.onAuthenticationFailure(request, response, exception);
+    }
+}
+----
+
+[source,java]
+----
+public class RestAuthClient {
+    String baseUrl = "http://localhost:8888/ecom";
+    public String authenticateGetCookie(String user, String password){
+        HttpMessageConverter<MultiValueMap<String, ?>> formHttpMessageConverter = new FormHttpMessageConverter();
+
+        HttpMessageConverter<String> stringHttpMessageConverternew = new StringHttpMessageConverter();
+
+        List<HttpMessageConverter<?>> messageConverters = new LinkedList<HttpMessageConverter<?>>();
+
+        messageConverters.add(formHttpMessageConverter);
+        messageConverters.add(stringHttpMessageConverternew);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("j_username", user);
+        map.add("j_password", password);
+
+        String authURL = baseUrl+"/j_spring_security_check";
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.setMessageConverters(messageConverters);
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map,
+                requestHeaders);
+
+        ResponseEntity<String> result = restTemplate.exchange(authURL, HttpMethod.POST, entity, String.class);
+        HttpHeaders respHeaders = result.getHeaders();
+        System.out.println(respHeaders.toString());
+
+        System.out.println(result.getStatusCode());
+
+        String cookies = respHeaders.getFirst("Set-Cookie");
+        return cookies;
+    }
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+}
+----
+
+== A Complete Example
+https://www.codesandnotes.be/2014/10/31/restful-authentication-using-spring-security-on-spring-boot-and-jquery-as-a-web-client/[RESTful authentication using Spring Security on Spring Boot, and jQuery as a web client]
+
+.pom.xml
+[source,xml]
+----
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.servlet.jsp.jstl</artifactId>
+          <groupId>org.eclipse.jetty.orbit</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+----
+
+.WebSecurityConfigurerAdapter
+[source,java]
+----
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
+  @Autowired
+  private RESTAuthenticationEntryPoint authenticationEntryPoint;
+  @Autowired
+  private RESTAuthenticationFailureHandler authenticationFailureHandler;
+  @Autowired
+  private RESTAuthenticationSuccessHandler authenticationSuccessHandler;
+
+  @Override
+  protected void configure(AuthenticationManagerBuilder builder) throws Exception {
+    builder.inMemoryAuthentication()
+           .withUser("user")
+           .password("user")
+           .roles("USER")
+           .and()
+           .withUser("admin")
+           .password("admin")
+           .roles("ADMIN");
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests()
+        .antMatchers("/rest/**")
+        .authenticated();
+
+    http.csrf()
+        .disable(); // disables CSRF (Cross Site Request Forgery)
+
+    http.exceptionHandling()
+        .authenticationEntryPoint(authenticationEntryPoint);
+
+    http.formLogin()
+        .successHandler(authenticationSuccessHandler);
+
+    http.formLogin()
+        .failureHandler(authenticationFailureHandler);
+  }
+}
+----
+
+.Custom Authentication Entry Point
+[source,java]
+----
+@Component
+public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
+  @Override
+  public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+      throws IOException, ServletException {
+
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+  }
+}
+----
+
+By implementing our own authentication entry point, we can tell Spring Security exactly what to do if someone tries to access a protected resource without being authenticated. But we are dealing with web services here, so what we actually want our system to do is: “if the client accesses a resource but is not authenticated, we respond with a 401 Unauthorized status“.
+
+The above code simply responds with a #401 Unauthorized status code# as soon as there’s an authentication problem.
+
+.Custom Authentication Success Handler
+[source,java]
+----
+@Component
+public class RESTAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+  @Override
+  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) throws IOException, ServletException {
+    clearAuthenticationAttributes(request);
+  }
+}
+----
+
+We only want the server to respond with a 200 HTTP status that the login was successful.
+
+.Custom Authentication Failure Handler
+[source,java]
+----
+@Component
+public class RESTAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+  @Override
+  public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException exception) throws IOException, ServletException {
+
+    super.onAuthenticationFailure(request, response, exception);
+  }
+}
+----
+
+.The Service
+[source,java]
+----
+// Principal instance, automatically filled by Spring Security for authenticated users
+
+@RequestMapping("/rest")
+@RestController()
+public class HelloweenWebService {
+  @RequestMapping(value = "/hello", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<HelloweenResponse> hello(Principal principal) {
+    return new ResponseEntity<HelloweenResponse>(
+        new HelloweenResponse("Happy Halloween, " + principal.getName() + "!"), HttpStatus.OK);
+  }
+
+  public static class HelloweenResponse {
+    private String message;
+    public HelloweenResponse(String message) {
+      this.message = message;
+    }
+    public String getMessage() {
+      return message;
+    }
+    public void setMessage(String message) {
+      this.message = message;
+    }
+  }
+}
+----
+

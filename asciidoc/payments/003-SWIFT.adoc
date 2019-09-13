@@ -1,0 +1,233 @@
+= SWIFT
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+== SWIFT Message Catalog
+
+[cols="1,2"]
+|===
+|Message type   |Description
+|MT0xx   |System messages
+|MT1xx   |Customer payments and cheques
+|MT2xx   |Financial institution transfers
+|MT3xx   |Treasury markets
+|MT4xx   |Collection and cash letters
+|MT5xx   |Securities markets
+|MT6xx   |Treasury markets – metals and syndications
+|MT7xx   |Documentary credits and guarantees
+|MT8xx   |Travelers cheques
+|MT9xx   |Cash management and customer status
+|===
+
+[cols="1,1,3,1"]
+|===
+|From   |To   |Message Description   |Format
+|PSH   |SWF   |Outgoing Credit Transfer   |MT103
+|SWF   |PSH   |Outgoing Charge Claims   |MT191
+|SWF   |PSH   |Incoming Request for Cancellation   |MT192
+|PSH   |SWF   |Outgoing Request for Cancellation   |MT192
+|SWF   |PSH   |Incoming Query message   |MT195
+|PSH   |SWF   |Outgoing Query message   |MT195
+|SWF   |PSH   |Incoming Answer message   |MT196
+|PSH   |SWF   |Outgoing Answer message   |MT196
+|SWF   |PSH   |Incoming Free Format message   |MT199
+|PSH   |SWF   |Outgoing Free Format message   |MT199
+|PSH   |SWF   |Outgoing Bank Transfer   |MT202
+|PSH   |SWF   |Outgoing Bank Transfer   |MT202COV
+|PSH   |SWF   |Outgoing Bank Transfer (domestic)   |MT205
+|PSH   |SWF   |Outgoing Bank Transfer (domestic)   |MT205COV
+|SWF   |PSH   |Incoming Request for Cancellation   |MT292
+|PSH   |SWF   |Outgoing Request for Cancellation   |MT292
+|SWF   |PSH   |Incoming Query message   |MT295
+|PSH   |SWF   |Outgoing Query message   |MT295
+|SWF   |PSH   |Incoming Answer message   |MT296
+|PSH   |SWF   |Outgoing Answer message   |MT296
+|SWF   |PSH   |Incoming Free Format message   |MT299
+|PSH   |SWF   |Outgoing Free Format message   |MT299
+|PSH   |SWF   |Outgoing Debit Confirmation   |MT900
+|PSH   |SWF   |Outgoing Credit Confirmation   |MT910
+|SWF   |PSH   |Incoming Free Format message   |MT999
+|PSH   |SWF   |Outgoing Free Format message   |MT999
+|SWF   |PSH   |Non-Delivery Warning   |MT010
+|SWF   |PSH   |Delivery Notification   |MT011
+|SWF   |PSH   |Sender Notification   |MT012
+|SWF   |PSH   |Delayed NAK   |MT015
+|SWF   |PSH   |Abort Notification   |MT019
+|SWF   |PSH   |incoming Credit Transfer Request   |MT101
+|SWF   |PSH   |Incoming Credit Transfer instruction   |MT103
+|SWF   |PSH   |Incoming Bank Transfer instruction for own account   |MT200
+|SWF   |PSH   |Incoming Multiple Bank Transfer instruction for own account   |MT201
+|SWF   |PSH   |Incoming Bank Transfer instruction   |MT202
+|SWF   |PSH   |Incoming Bank Transfer instruction   |MT202COV
+|SWF   |PSH   |Incoming Multiple Bank Transfer instruction   |MT203
+|SWF   |PSH   |Incoming Bank Transfer (domestic)   |MT205
+|SWF   |PSH   |Incoming Bank Transfer (domestic)   |MT205COV
+|SWF   |PSH   |Incoming Advice to Receive   |MT210
+|SWF   |PSH   |Incoming Credit Advice   |MT910
+|SWF   |PSH   |Acknowledgement of Outgoing Credit Transfer   |ACK
+|SWF   |PSH   |Rejection of Outgoing Credit Transfer   |NAK
+|===
+
+== MT103 Fields
+[cols="1,2"]
+|===
+|Tag |Name
+|20 |Transaction reference number
+|23B |Bank operation code
+|32A |Value date / currency / interbank settled
+|33B |Currency / original ordered amount
+|50A, F or K   |Ordering customer (payer) or address of the remitter.
+|52A or D   |Ordering institution (payer's bank)
+|53A, B or D   |Sender's correspondent (bank)
+|54A, B or D   |Receiver's correspondent (bank)
+|56A, C or D   |Intermediary (bank)
+|59 or 59A   |Beneficiary
+|57A, B, C or D   |Account with institution (beneficiary's bank)
+|70 |Remittance information
+|71A |Details of charges (OUR/SHA/BEN)
+|72 |Sender to receiver information
+|77B |Regulatory reporting
+|===
+
+== Message Structure
+....
+{1:F01TESTBIC12XXX0360105154}{2:O5641057130214TESTBIC34XXX26264938281302141757N}{3:{103:CAD}{108:2RDRQDHM3WO}}{4:
+:16R:GENL
+:20C::CORP//1234567890123456
+:20C::SEME//9876543210987654
+:23G:NEWM
+:22F::CAEV//INTR
+:22F::CAMV//MAND
+:98C::PREP//20220202105733
+:25D::PROC//ENTL
+:16S:GENL
+:16R:USECU
+:35B:ISIN CH0101010101
+/XS/232323232
+FINANCIAL INSTRUMENT ACME
+:16R:FIA
+:22F::MICO//A007
+:16S:FIA
+:16R:ACCTINFO
+:97A::SAFE//99999
+:94F::SAFE//NCSD/TESTBIC0ABC
+:93B::ELIG//FAMT/500000,
+:93B::SETT//FAMT/500000,
+:16S:ACCTINFO
+:16S:USECU
+:16R:CADETL
+:98A::ANOU//20220113
+:98A::RDTE//20220113
+:69A::INPE//20220214/20220214
+:99A::DAAC//360
+:92K::INTR//UKWN
+:22F::ADDB//CAPA
+:16S:CADETL
+:16R:CAOPTN
+:13A::CAON//001
+:22F::CAOP//CASH
+:11A::OPTN//USD
+:17B::DFLT//Y
+:16R:CASHMOVE
+:22H::CRDB//CRED
+:22H::CONT//ACTU
+:97A::CASH//89898
+:19B::ENTL//USD3333,
+:19B::TXFR//USD3333,
+:19B::NETT//USD3333,
+:98A::PAYD//20220214
+:98A::VALU//20220214
+:98A::EARL//20220214
+:92A::INTP//0,75
+:92A::TAXR//0,
+:16S:CASHMOVE
+:16S:CAOPTN
+:16R:ADDINFO
+:70E::ADTX//PAYMENT UPON RECEIPT OF FUNDS -
+TIMELY PAYMENT EXPECTED
+:16S:ADDINFO
+-}{5:{CHK:C77F8E009597}}
+....
+
+Basic header block::
+containing information about the message source.
+The Basic header block {1:F01TESTBIC12XXX0360105154} contains five fixed-length fields:
+- F — Application ID
+- 01 — Service ID
+- TESTBIC12XXX — Logical terminal address of the message source
+- 0360 — Session number
+- 105154 — Sequence number
+
+Application header block ::
+with information about message type and destination of the message.
+The application header block can be either of type Input or Output. The output block {2:O5641057130214TESTBIC34XXX26264938281302141757N} contains a set of fixed-length fields:
+
+- O — Direction
+- 564 — Message type
+- 1057 — Input time
+- 130214 — Input date
+- TESTBIC34XXX — Logical terminal address of the message destination
+- 2626 — Session number
+- 493828 — Sequence number
+- 130214 — Output date
+- 1757 — Output time
+- N — Priority
+
+An input block has a different structure and consists of six fixed-length fields.
+
+Optional User Header Block::
+Optional processing instructions.
+
+- In {3:{103:CAD}{108:2RDRQDHM3WO}} the sub-block 103 specifies a Service identifier and 108 a Message user reference.
+
+Text block::
+Contains the actual SWIFT message.
+
+User trailer block::
+- {5:{CHK:C77F8E009597}} it contains a Checksum.
+
+MT Message::
+The MT message consists of a sequence of fields. The fields are generally in format #:<type><option>:content<crlf>:#
+
+- the colons enclose the field tag
+- type is a two digit number that represents the logical type (amount, rate, date, narrative etc.)
+- optional option a letter that specifies the format (e.g. rate expressed as a fraction or as a decimal number)
+- the structure of content is dependent on the type and option. The content can be a single line or multiple lines. A field begins with a colon and ends with a line break (CRLF) followed either by semicolon (beginning of the next field) or hyphen (end of the MT message).
+
+.Multi-line field
+....
+:35B:ISIN CH0101010101
+/XS/232323232
+FINANCIAL INSTRUMENT ACME
+....
+
+The whitespace characters and line breaks are significant in the whole SWIFT message and cannot be used arbitrarily. There must not be any line breaks between message blocks, blank lines between fields or any leading or trailing spaces in the fields (unless they are part of the data, e.g. in Narrative fields). In a multi-line field the colon : and a hyphen - must never be used as the first character of second or subsequent lines (with the exception of special field [77E][], see below).
+
+.Another example
+....
+{1:F01MGTCZAJJAXXX0000%R6%}{2:O1031345150526ABSAZAJJAXXX00009990011505251345N}{3:{103:}{108:SWIFT_SA_Test-IGV65E}{119:STP}}{4:
+:20:SWF8232784999001
+:23B:CRED
+:32A:150526ZAR202103,34
+:33B:ZAR202103,34
+:50K:/7162600000
+IC1.NAME
+IC1.ADDR1
+IC1.ADDR2
+IC1.ADDR3 SOUTH AFRICA
+:53B:/7162600000
+:57A://ZA005200
+ALBRZAJ1
+:59:/7167600000
+EB2C1.NAME
+EB2C1.ADDR1
+EB2C1.ADDR2
+EB2C1.ADDR3 SOUTH AFRICA
+:70:
+:71A:BEN
+:71F:ZAR0,00
+:72:/REC/IAT-XBS/
+-}{5:{MAC:12343}{   :1232312}}
+....

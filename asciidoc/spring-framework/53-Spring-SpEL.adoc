@@ -1,0 +1,9 @@
+= Spring Framework - SpEL
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+SpEL is not directly tied to Spring and can be used independently.
+
+See springtest/spel for tests.
