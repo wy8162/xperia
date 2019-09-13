@@ -1,0 +1,11 @@
+These study notes are the results of studying verious documents and books. To name some:
+
+. Spring Framework Reference Documentation
+. Spring Boot Reference Documentation
+. Spring in Action
+. Stackover.com
+. Quora.com
+. Infoq.com
+. www.cubrid.org - all about JVM, Garbage Collection.
+
+And all the others.
