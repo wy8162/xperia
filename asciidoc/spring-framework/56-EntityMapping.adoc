@@ -1,0 +1,150 @@
+= All About Relationship Mapping
+
+== OneToMany
+
+=== Example 1: One-to-Many association using generics
+
+==== In Customer class:
+
+[source,java]
+@OneToMany(cascade=ALL, mappedBy="customer")
+public Set<Order> getOrders() { return orders; }
+
+==== In Order class:
+
+[source,java]
+@ManyToOne
+@JoinColumn(name="CUST_ID", nullable=false)
+public Customer getCustomer() { return customer; }
+
+
+=== Example 2: One-to-Many association without using generics
+
+==== In Customer class:
+
+[source,java]
+@OneToMany(targetEntity=com.acme.Order.class, cascade=ALL,
+          mappedBy="customer")
+public Set getOrders() { return orders; }
+
+==== In Order class:
+[source,java]
+@ManyToOne
+@JoinColumn(name="CUST_ID", nullable=false)
+public Customer getCustomer() { return customer; }
+
+
+=== Example 3: Unidirectional One-to-Many association using a foreign key mapping
+
+==== In Customer class:
+[source,java]
+@OneToMany(orphanRemoval=true)
+@JoinColumn(name="CUST_ID") // join column is in table for Order
+public Set<Order> getOrders() {return orders;}
+
+== OneToOne
+=== Example 1: One-to-one association that maps a foreign key column
+
+==== On Customer class:
+[source,java]
+@OneToOne(optional=false)
+@JoinColumn(
+name="CUSTREC_ID", unique=true, nullable=false, updatable=false)
+public CustomerRecord getCustomerRecord() { return customerRecord; }
+
+==== On CustomerRecord class:
+[source,java]
+@OneToOne(optional=false, mappedBy="customerRecord")
+public Customer getCustomer() { return customer; }
+
+
+=== Example 2: One-to-one association that assumes both the source and target share the same primary key values.
+
+==== On Employee class:
+[source,java]
+@Entity
+public class Employee {
+@Id Integer id;
+
+[source,java]
+@OneToOne @MapsId
+EmployeeInfo info;
+...
+}
+
+==== On EmployeeInfo class:
+[source,java]
+@Entity
+public class EmployeeInfo {
+@Id Integer id;
+...
+}
+
+
+=== Example 3: One-to-one association from an embeddable class to another entity.
+[source,java]
+@Entity
+public class Employee {
+ @Id int id;
+ @Embedded LocationDetails location;
+ ...
+}
+[source,java]
+@Embeddable
+public class LocationDetails {
+ int officeNumber;
+ @OneToOne ParkingSpot parkingSpot;
+ ...
+}
+[source,java]
+@Entity
+public class ParkingSpot {
+ @Id int id;
+ String garage;
+ @OneToOne(mappedBy="location.parkingSpot") Employee assignedTo;
+  ...
+}
+
+== ManyToMany
+=== Example 1:
+
+==== In Customer class:
+[source,java]
+@ManyToMany
+@JoinTable(name="CUST_PHONES")
+public Set<PhoneNumber> getPhones() { return phones; }
+
+==== In PhoneNumber class:
+[source,java]
+@ManyToMany(mappedBy="phones")
+public Set<Customer> getCustomers() { return customers; }
+
+=== Example 2:
+
+==== In Customer class:
+[source,java]
+@ManyToMany(targetEntity=com.acme.PhoneNumber.class)
+public Set getPhones() { return phones; }
+
+==== In PhoneNumber class:
+[source,java]
+@ManyToMany(targetEntity=com.acme.Customer.class, mappedBy="phones")
+public Set getCustomers() { return customers; }
+
+=== Example 3:
+
+==== In Customer class:
+[source,java]
+@ManyToMany
+@JoinTable(name="CUST_PHONE",
+  joinColumns=
+      @JoinColumn(name="CUST_ID", referencedColumnName="ID"),
+  inverseJoinColumns=
+      @JoinColumn(name="PHONE_ID", referencedColumnName="ID")
+  )
+public Set<PhoneNumber> getPhones() { return phones; }
+
+==== In PhoneNumberClass:
+[source,java]
+@ManyToMany(mappedBy="phones")
+public Set<Customer> getCustomers() { return customers; }

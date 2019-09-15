@@ -1,0 +1,71 @@
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (101, 'CHM01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (101, 'PHY01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (101, 'ENG01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (102, 'CHM01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (102, 'PHY01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (102, 'ENG01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (103, 'HST01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (103, 'MTH01');
+INSERT INTO STUDENT_COURSE (FK_STUDENT, FK_COURSE) VALUES (104, 'ART01');
+
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (1, 'NA', 'CHM01', 101);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (2, 'NA', 'PHY01', 101);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (3, 'NA', 'ENG01', 101);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (4, 'NA', 'CHM01', 102);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (5, 'NA', 'PHY01', 102);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (6, 'NA', 'ENG01', 102);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (7, 'NA', 'HST01', 103);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (8, 'NA', 'MTH01', 103);
+INSERT INTO COURSE_RECORD (ID, SCORE, COURSE_ID, STUDENT_ID) VALUES (9, 'NA', 'ART01', 104);
+
+
+select * from Course_Record;
+
+select * from Course where Course_Id in (select Course_Id from Course_Record where Student_Id = '101');
+
+select * from Student where Student_Id in (select Student_Id from Course_Record where Course_Id = 'PHY01');
+
+select * from Course_Record where Student_Id in ('101');
+
+select * from Course_Record where Course_Id in ('ART01');
+
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+
+	@Query("SELECT new com.jeejava.dto.DeptEmpDto(d.name, e.name, e.email, e.address) "
+			+ "FROM Department d INNER JOIN d.employees e")
+	List<DeptEmpDto> fetchEmpDeptDataInnerJoin();
+
+	@Query("SELECT new com.jeejava.dto.DeptEmpDto(d.name, e.name, e.email, e.address) "
+			+ "FROM Department d, Employee e")
+	List<DeptEmpDto> fetchEmpDeptDataCrossJoin();
+
+}
+
+public interface DepartmentRepository extends JpaRepository<Department, Integer> {
+
+	@Query("SELECT new com.jeejava.dto.DeptEmpDto(d.name, e.name, e.email, e.address) "
+			+ "FROM Department d LEFT JOIN d.employees e")
+	List<DeptEmpDto> fetchEmpDeptDataLeftJoin();
+
+	@Query("SELECT new com.jeejava.dto.DeptEmpDto(d.name, e.name, e.email, e.address) "
+			+ "FROM Department d RIGHT JOIN d.employees e")
+	List<DeptEmpDto> fetchEmpDeptDataRightJoin();
+
+}
+
+public class DeptEmpDto {
+
+	private String empDept;
+	private String empName;
+	private String empEmail;
+	private String empAddress;
+
+select s.name, c.course_name, r.rating
+from student s, course_record r, course c
+where s.student_id = r.student_id and r.course_id = c.course_id
+
+select s.name, c.course_name, r.rating
+from student s inner join course_record r, course c
+where s.student_id = r.student_id and r.course_id = c.course_id
+
+2015-09-01T16%3A20%3A00.000Z

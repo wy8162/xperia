@@ -16,6 +16,7 @@
         <module>java8</module>
         <module>json</module>
         <module>springtest</module>
+        <module>springdata</module>
         <module>restful</module>
         <module>uri</module>
         <module>web</module>
