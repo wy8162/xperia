@@ -5,6 +5,8 @@
 :toc-title: My Contentvs
 
 == Structuring Cucumber BDD
+Project Weathertracker has a complete sample for Cucumber tests.
+
 === Location of Features
 Stores the feature files in folder [black white-background]#src/test/resources/features/#. The feature files can be organized in different folders based on domains.
 
