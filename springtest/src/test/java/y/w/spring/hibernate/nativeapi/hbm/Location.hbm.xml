@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="y.w.spring.hibernate.nativeapi">
+    <class name="Location" table="HBM_LOCATIONS">
+        <id name="id" column="LOCATION_ID" type="long">
+            <generator class="increment"/>
+        </id>
+        <property name="name" column="LOCATION_NAME" type="string"/>
+
+        <component name="mailingAddress" class="Address" > 
+            <property name="streetAddress" column="m_street_address" type="string"/> 
+            <property name="city" column="m_city" type="string"/> 
+            <property name="state" column="m_state" type="string"/> 
+            <property name="zipCode" column="m_zip_code" type="string"/> 
+        </component> 
+
+        <component name="billingAddress" class="Address" > 
+            <property name="streetAddress" column="b_street_address" type="string"/> 
+            <property name="city" column="b_city" type="string"/> 
+            <property name="state" column="b_state" type="string"/> 
+            <property name="zipCode" column="b_zip_code" type="string"/> 
+        </component> 
+    </class>
+</hibernate-mapping>
+

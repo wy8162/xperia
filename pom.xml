@@ -21,6 +21,7 @@
         <module>uri</module>
         <module>web</module>
         <module>webapp</module>
+        <module>xml</module>
     </modules>
 
     <properties>

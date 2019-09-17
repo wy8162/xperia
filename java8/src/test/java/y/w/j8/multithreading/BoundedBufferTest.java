@@ -1,0 +1,87 @@
+/**
+ * Yang Wang, Feb 26, 2012
+ */
+package y.w.j8.multithreading;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * @author yangwang
+ *
+ */
+public class BoundedBufferTest {
+	private static final long LOCKOUT_DETECT_TIMEOUT = 1000;
+	static Logger log = Logger.getLogger(BoundedBuffer.class);
+
+	@Test public void testIsEmptyWhenConstructed() {
+		BoundedBuffer<Integer> bb = new BoundedBuffer<Integer>(10);
+		assertTrue(bb.isEmpty());
+		assertFalse(bb.isFull());
+	}
+	
+	@Test public void testIsFullAfterPuts() throws InterruptedException {
+		BoundedBuffer<Integer> bb = new BoundedBuffer<Integer>(10);
+		for (int i=0; i<10; i++)
+			bb.put(i);
+		assertTrue(bb.isFull());
+		assertFalse(bb.isEmpty());
+	}
+	
+	@Test public void testTakeBlocksWhenEmpty() {
+		final BoundedBuffer<Integer> bb = new BoundedBuffer<Integer>(10);
+		
+		Thread taker = new Thread() {
+			public void run() {
+				try {
+					int unused = bb.take();
+					fail(); // Fail if we get here.
+				} catch (InterruptedException success) {
+					log.debug("Received Intterupt - success that the method was blocked.");
+				}
+			}
+		};
+		try {
+			taker.start();
+			Thread.sleep(LOCKOUT_DETECT_TIMEOUT);
+			taker.interrupt();
+			taker.join(LOCKOUT_DETECT_TIMEOUT);
+			assertFalse(taker.isAlive());
+		} catch (Exception unexpected) {
+			fail();
+		}
+	}
+	
+	@Test public void testPutBlocksWhenFull() {
+		final BoundedBuffer<Integer> bb = new BoundedBuffer<Integer>(10);
+		for (int i=0; i<10; i++) {
+			try {
+				bb.put(i);
+			} catch (InterruptedException e) {}
+		}
+		
+		Thread putter = new Thread() {
+			public void run() {
+				try {
+					bb.put(11);
+					fail(); // Fail if we get here.
+				} catch (InterruptedException success) {
+					log.debug("Received Intterupt - success that the method was blocked.");
+				}
+			}
+		};
+		try {
+			putter.start();
+			Thread.sleep(LOCKOUT_DETECT_TIMEOUT);
+			putter.interrupt();
+			putter.join(LOCKOUT_DETECT_TIMEOUT);
+			assertFalse(putter.isAlive());
+		} catch (Exception unexpected) {
+			fail();
+		}
+	}
+}

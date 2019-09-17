@@ -1,0 +1,279 @@
+GIT HOW TO
+
+Setup SSH	2
+Setup Git Repository	2
+Usefule Commands	4
+Pushing Local Branch to Remote	5
+A small script:	5
+Get the New Branch from Remote	6
+How to Undo the Last Commit	6
+How to undo a local commit	7
+How to undo a public commit	7
+Undoing in Git - Reset, Checkout and Revert	8
+Fixing un-committed mistakes	8
+Fixing committed mistakes	8
+
+HOW TO SETUP SSH AND GIT
+
+Setup SSH
+
+1. Generate ssh keys
+   Enter passphrase "xxxxxxxxxx"
+
+    ssh-keygen -t rsa -C "wy8162@gmail.com"
+
+   Make sure 'ssh localhost' works by the following command:
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+2. Login to GitHub, select account setting, and enter the public key from id_rsa.pub
+
+3. Test GitHub
+    ssh -T git@github.com
+
+4. Configure Git
+    git config --global user.name 'Yang Wang'
+    git config --global user.email 'wy8162@gmail.com'
+
+Setup Git Repository
+
+5. Configure a local Git Repository - Using ssh instead of a git daemon
+a. Create a directory:
+    /Users/yangwang/Prog/git.repo
+b. Create a local repository under git.repo
+    /Users/yangwang/Prog/git.repo/e2esuite.git
+c. Initialize a bare git repository
+    cd /Users/yangwang/Prog/git.repo/e2esuite.git
+    git init --bare
+    git config --global user.name 'Yang Wang'
+    git config --global user.email 'wy8162@gmail.com'
+    touch git-daemon-export-ok
+d. Make sure the host of the repository can be sshed
+
+6. Using the Local Repository
+a. Create a local working directory, i.e.
+        mkdir e2esuite
+        git init
+        git config --global user.name 'Yang Wang'
+        git config --global user.email 'wy8162@gmail.com'
+        git remote add e2esuite.git ssh://localhost/Users/yangwang/Prog/git.repo/e2esuite.git
+b. Push the files to local repository
+        git push e2esuite.git master
+
+   Clone from the local repository
+c. Create a local working directory, i.e.
+        mkdir e2esuite
+        git init
+        git config --global user.name 'Yang Wang'
+        git config --global user.email 'wy8162@gmail.com'
+        git remote add e2esuite.git ssh://localhost/Users/yangwang/Prog/git.repo/e2esuite
+d. Push the files to local repository
+        git fetch e2esuite.git
+7. Configure a Local / Remote Git Repository - Using Git daemon
+a. Create a directory git.repo (GIT_DIR):
+        /Users/yangwang/Prog/git.repo
+b. Start daemon (script in ~/Applications/local/bin)
+        /usr/bin/git daemon --reuseaddr --base-path=/git --export-all --verbose --enable=receive-pack --detach
+c. Create a local repository under git.repo (GIT_DIR)
+        /Users/yangwang/Prog/git.repo/e2esuite.git
+        cd /Users/yangwang/Prog/git.repo/e2esuite.git
+        git init --bare
+        git config --global user.name 'Yang Wang'
+        git config --global user.email 'wy8162@gmail.com'
+        touch git-daemon-export-ok
+
+d. Use it (NOTE: no need to enter the full path)
+        git remote add e2esuite.git git://localhost/e2esuite.git
+
+8. Create a git repository in Windows - with Cygwin
+a. Open a bash shell
+b. In the directory /cygdrive/c/Cygwin/usr/bin/, create a file named "gitd" with the following content:
+          #!/bin/bash
+          /usr/bin/git daemon --reuseaddr --base-path=/git --export-all --verbose --enable=receive-pack --detach
+c. Run the following cygrunsrv command to install the script as a service (Note: assumes Cygwin is installed at C:\Cygwin):
+            cygrunsrv   --install gitd              \
+            --path c:/cygwin/bin/bash.exe           \
+            --args c:/cygwin/usr/bin/gitd           \
+            --desc "Git Daemon"                     \
+            --neverexits                            \
+            --shutdown
+d. Start the service:
+        cygrunsrv --start gitd
+e. Done
+
+9. Test it
+a. Create a repository under the 'git' directory (refer to the daemon command above)
+        cd git
+        mkdir testproject.git
+        cd testproject.git
+        git init --bare
+        touch git-daemon-export-ok
+b. Push contents into it
+        mkdir testproject
+        ...
+        git remote add testproject.git git://localhost/testproject.git
+        git push testproject.git master
+        c. Fetch it / clone it
+        git fetch testproject.git
+        git clone testproject.git
+
+Usefule Commands
+
+"git add" is called staging. So the most natural command to stage the changes (changed files) is the obvious one:
+
+    git stage
+    git add is just an easier to type alias for git stage
+
+    Pity there is no git unstage nor git unadd commands. The relevant one is harder to guess or remember, but is pretty obvious:
+
+    git reset HEAD --
+    We can easily create an alias for this:
+
+    git config --global alias.unadd='reset HEAD --'
+    git config --global alias.unstage='reset HEAD --'
+    And finally, we have new commands:
+
+    git add file1
+    git stage file2
+    git unadd file2
+    git unstage file1
+    Personally I use even shorter aliases:
+
+    git a #for staging
+    git u #for unstaging
+
+Pushing Local Branch to Remote
+
+    http://www.zorched.net/2008/04/14/start-a-new-branch-on-your-remote-git-repository/
+
+1. Push the local branch to the remote repository (the branch will be created on fly if not exists)
+            git push origin newBranch
+        
+        or a simple one:
+            git push origin HEAD
+            
+        or this one for working set up to track remote branch working from origin to make sure your local branch becomes a tracking branch so any changes pushed to the remote will be pulled back into your branch easily.
+            git push --set-upstream origin newBranch
+ 
+2. Checkout the new branch
+        Do fetch if neccessary:
+            git fetch origin
+        
+3. Then check out the new branch - create it locally if not yet. This means that when you do pulls that it will get the latest from that branch as well.
+            git checkout --track -b origin/newBranch
+            git pull
+
+4. The last "git pull" is to make sure everything is up to date.
+
+5. To show all the remote branches:
+              git branch -r
+		git ls-remote
+
+6. What if I messed up and want to delete the branch in remote? Do this:
+            git push origin :heads/newBranch
+            
+    A small script:
+        #!/bin/sh
+        # git-create-branch <branch_name>
+         
+        if [ $# -ne 1 ]; then
+                 echo 1>&2 Usage: $0 branch_name
+                 exit 127
+        fi
+         
+        set branch_name = $1
+        git push origin origin:refs/heads/${branch_name}
+        git fetch origin
+        git checkout --track -b ${branch_name} origin/${branch_name}
+        git pull
+
+Get the New Branch from Remote
+
+1. git clone git://remotehost/abc.git
+2. git ls-remote to list the branches in the remote
+3. git branch –r to list the branches in the remote
+4. git branch working origin/working
+That'll create a new local branch using the remote's branch as the starting point.
+5. git checkout working
+
+How to Undo the Last Commit
+http://stackoverflow.com/questions/927358/git-undo-last-commit
+Undoing a commit is a little scary if you don't know how it works. But it's actually amazingly easy if you do understand.
+Say you have this, where C is your HEAD and (F) is the state of your files.
+   (F)
+A-B-C
+    ?
+  master
+You want to nuke commit C and never see it again. You do this:
+git reset --hard HEAD~1
+The result is:
+ (F)
+A-B
+  ?
+master
+Now B is the HEAD. Because you used --hard, your files are reset to their state at commit B.
+Ah, but suppose commit C wasn't a disaster, but just a bit off. You want to undo the commit but keep your changes for a bit of editing before you do a better commit. Starting again from here, with C as your HEAD:
+   (F)
+A-B-C
+    ?
+  master
+You can do this, leaving off the --hard:
+git reset HEAD~1
+In this case the result is:
+   (F)
+A-B-C
+  ?
+master
+In both cases, HEAD is just a pointer to the latest commit. When you do a git reset HEAD~1, you tell Git to move the HEAD pointer back one commit. But (unless you use --hard) you leave your files as they were. So now git status shows the changes you had checked into C. You haven't lost a thing!
+For the lightest touch, you can even undo your commit but leave your files and your index:
+git reset --soft HEAD~1
+This not only leaves your files alone, it even leaves your index alone. When you do git status, you'll see that the same files are in the index as before. In fact, right after this command, you could do git commit and you'd be redoing the same commit you just had.
+One more thing: Suppose you destroy a commit as in the first example, but then discover you needed it after all? Tough luck, right?
+Nope, there's still a way to get it back. Type git reflog and you'll see a list of (partial) commit shas that you've moved around in. Find the commit you destroyed, and do this:
+git checkout -b someNewBranchName shaYouDestroyed
+You've now resurrected that commit. Commits don't actually get destroyed in Git for some 90 days, so you can usually go back and rescue one you didn't mean to get rid of.
+How to undo a local commit
+Lets say I committed locally, but now want to remove that commit.
+git log
+    commit 101: bad commit    # latest commit, this would be called 'HEAD'
+    commit 100: good commit   # second to last commit, this is the one we want
+To restore everything back to the way it was prior to the last commit, we need to reset to the commit before HEAD:
+git reset --soft HEAD^     # use --soft if you want to keep your changes
+git reset --hard HEAD^     # use --hard if you don't care about keeping the changes you made
+
+How to undo a public commit
+If you have already made your commits public, you will want to create a new commit which will "revert" the changes you made in your previous commit (current HEAD).
+git revert HEAD
+Your changes will now be reverted and ready for you to commit:
+git commit -m 'restoring the file I removed on accident'
+git log
+    commit 102: restoring the file I removed on accident
+    commit 101: removing a file we dont need
+    commit 100: adding a file that we need
+
+
+Undoing in Git - Reset, Checkout and Revert
+http://book.git-scm.com/4_undoing_in_git_-_reset,_checkout_and_revert.html
+Git provides multiple methods for fixing up mistakes as you are developing. Selecting an appropriate method depends on whether or not you have committed the mistake, and if you have committed the mistake, whether you have shared the erroneous commit with anyone else.
+Fixing un-committed mistakes
+If you've messed up the working tree, but haven't yet committed your mistake, you can return the entire working tree to the last committed state with
+$ git reset --hard HEAD
+This will throw away any changes you may have added to the git index and as well as any outstanding changes you have in your working tree. In other words, it causes the results of "git diff" and "git diff --cached" to both be empty.
+If you just want to restore just one file, say your hello.rb, use git checkout instead
+$ git checkout -- hello.rb
+$ git checkout HEAD hello.rb
+The first command restores hello.rb to the version in the index, so that "git diff hello.rb" returns no differences. The second command will restore hello.rb to the version in the HEAD revision, so that both "git diff hello.rb" and "git diff --cached hello.rb" return no differences.
+Fixing committed mistakes
+If you make a commit that you later wish you hadn't, there are two fundamentally different ways to fix the problem:
+1. You can create a new commit that undoes whatever was done by the old commit. This is the correct thing if your mistake has already been made public.
+2. You can go back and modify the old commit. You should never do this if you have already made the history public; git does not normally expect the "history" of a project to change, and cannot correctly perform repeated merges from a branch that has had its history changed.
+Fixing a mistake with a new commit
+Creating a new commit that reverts an earlier change is very easy; just pass the git revert command a reference to the bad commit; for example, to revert the most recent commit:
+$ git revert HEAD
+This will create a new commit which undoes the change in HEAD. You will be given a chance to edit the commit message for the new commit.
+You can also revert an earlier change, for example, the next-to-last:
+$ git revert HEAD^
+In this case git will attempt to undo the old change while leaving intact any changes made since then. If more recent changes overlap with the changes to be reverted, then you will be asked to fix conflicts manually, just as in the case of resolving a merge.
+Fixing a mistake by modifying a commit
+If you have just committed something but realize you need to fix up that commit, recent versions of git commit support an --amend flag which instructs git to replace the HEAD commit with a new one, based on the current contents of the index. This gives you an opportunity to add files that you forgot to add or correct typos in a commit message, prior to pushing the change out for the world to see.
+If you find a mistake in an older commit, but still one that you have not yet published to the world, you use git rebase in interactive mode, with "git rebase -i" marking the change that requires correction with edit. This will allow you to amend the commit during the rebasing process.
+

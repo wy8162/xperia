@@ -1,0 +1,10 @@
+= Java Multi-Threading
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+There are self-contained Groovy sample programs testing various Groovy GPAR Actor and Java multi-thread programming.
+
+The tests can be found under #java8/src/test/groovy/y.w.concurrency#.
+

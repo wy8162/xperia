@@ -1,0 +1,91 @@
+= Java Proxy Configuration
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+References: http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html
+
+1. Use System Properties: Refer to the URL above for more details
+
+.Sample Java Proxy Configuration
+[NOTE]
+====
+JAVA_OPTS=-Xmx1024m -Dhttp.proxyHost=serverHostAddress -Dhttp.proxyPort=8080 -Dhttp.proxyUser=ywang -Dhttp.nonProxyHosts=*.org -Dhttp.proxyPassword=xxx
+====
+
+To set it one time, edit JAVA_HOME/lib/net.properties or JAVA_HOME/jre/lib/net.properties
+
+If there is no system settings for it, it won't work either. So, it's better to use ProxySelector.
+
+Default Networking Configuration File::
+* This file may contain default values for the networking system properties.
+* These values are only used when the system properties are not specified
+* on the command line or set programatically.
+* For now, only the various proxy settings can be configured here.
+
+Whether or not the DefaultProxySelector will default to System Proxy::
+* settings when they do exist.
+* Set it to 'true' to enable this feature and check for platform
+* specific proxy settings
+* Note that the system properties that do explicitely set proxies
+* (like http.proxyHost) do take precedence over the system settings
+* even if java.net.useSystemProxies is set to true.
+
+java.net.useSystemProxies=true
+
+Proxy configuration for the various protocol handlers::
+* DO NOT uncomment these lines if you have set java.net.useSystemProxies
+* to true as the protocol specific properties will take precedence over
+* system settings.
+
+....
+HTTP Proxy settings. proxyHost is the name of the proxy server
+ (e.g. proxy.mydomain.com), proxyPort is the port number to use (default
+ value is 80) and nonProxyHosts is a '|' separated list of hostnames which
+ should be accessed directly, ignoring the proxy server (default value is
+ localhost & 127.0.0.1).
+
+ http.proxyHost=
+ http.proxyPort=80
+ http.nonProxyHosts=localhost|127.0.0.1
+ http.proxyHost=corp-55w-proxy.mhc
+ http.proxyPort=8080
+ http.proxyUser=yang_wang
+ http.proxyPassword=
+ http.nonProxyHosts=*.mhc
+....
+
+== Use Proxy Class and URL.openConnection
+SocketAddress addr = new
+InetSocketAddress("webcache.mydomain.com", 8080);
+Proxy proxy = new Proxy(Proxy.Type.HTTP, addr);
+URL url = new URL("http://java.sun.com/");
+URConnection conn = url.openConnection(proxy);
+
+    And if some URL doesn't need proxy:
+
+    URL url2 = new URL("http://infos.mydomain.com/");
+    URLConnection conn2 = url2.openConnection(Proxy.NO_PROXY);
+
+    And for Socket:
+
+    SocketAddress addr = new InetSocketAddress("socks.mydomain.com", 1080);
+    Proxy proxy = new Proxy(Proxy.Type.SOCKS, addr);
+    URL url = new URL("ftp://ftp.gnu.org/README");
+    URLConnection conn = url.openConnection(proxy);
+
+    Socket socket = new Socket(Proxy.NO_PROXY);
+    socket.connect(new InetAddress("localhost", 1234));
+
+== Use ProxySelector (subproject xml)
+ProxySelectorImpl ps = new ProxySelectorImpl(ProxySelector.getDefault());
+ProxySelector.setDefault(ps);
+Authenticator.setDefault(new ProxyAuthenticator("yang_wang", "xxxx"));
+
+....
+URL url = new URL("http://java.sun.com/index.html");
+URLConnection conn = url.openConnection();
+InputStream in = conn.getInputStream();
+....
+

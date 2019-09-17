@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Best Practice of Web Services</title>
+
+    <author>
+      <firstname>Yang</firstname>
+
+      <surname>Wang</surname>
+
+      <affiliation>
+        <orgname>Application Operation</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>1/27/2012</pubdate>
+  </bookinfo>
+	<!-- This document was created with Syntext Serna Free. -->
+	<xi:include href="xincluded.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
+        <xi:fallback xmlns:xi="http://www.w3.org/2001/XInclude">
+            <xi:include href="fallback_content/xincluded.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+        </xi:fallback>
+	</xi:include>
+  <chapter>
+	<title>Test Chapter</title>
+	<para>
+		XINCLUDETEST.XML - This is a test paragraph
+	</para>
+  </chapter>
+</book>
+

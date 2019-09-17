@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+<chapter id="chap-JBoss_Sample_Project-Test_Chapter1">
+	<title>Test Chapter</title>
+	<para>
+		XINCLUDED.XML fallback 王扬－－－试试汉字。This is a test paragraph
+	</para>
+</chapter>
+
