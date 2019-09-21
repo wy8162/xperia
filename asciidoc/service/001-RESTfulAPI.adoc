@@ -1,0 +1,181 @@
+= RESTful API
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+== Web Architecture
+. Client server.
+. Uniform interface - each URI uniquely represent a resource.
+. Layered system.
+. Stateless.
+. Code-on-demand - transfer executable program or script to client side on demand.
+
+NOTE: REST - Representational State Transfer
+
+NOTE: REST API - exposes a set of data and functions to facilitate the interactions between the computer programs and allow them to exchange information.
+
+.SOAP vs RESTful
+[NOTE]
+====
+|===
+|SOAP |REST
+
+|A XML based message protocol
+|An architectural style representational state transfer
+
+|WSDL used for communication between consumer and provider
+|JSON, XML, text, CSV or other formats are supported
+
+|Invokes services by calling RPC method
+|Calls services via URL path
+
+|Transfer over HTTP, SMTP, FTP, etc.
+|Mainly HTTP. Not necessarily have to be HTTP.
+
+|Slower and large overhead (XML)
+|Fast and lightweight (JSON)
+
+|Function driven - transfer structured information
+|Data driven: access to resource for data
+
+|WS-security and SSL
+|SSL and HTTPS
+
+|Can't be cached
+|Can be cached
+
+|Strict communication contract. Needs knowledge of everything before interaction.
+|Needs no knowledge of the API.
+
+|Defines standards to be strictly followed
+|Not too much standards
+|===
+====
+
+== REST API Design
+
+.Questions to be addressed
+[NOTE]
+====
+. When should URI path segments be named with plural nouns?
+. Which request method should be used to update resource state?
+. How do I map non-CRUD operations to my URI?
+. What is the approriate HTTP response status code for a given scenario?
+. How can I manage the versions of a resource's state representations?
+. How should I structure a hyperlink in JSON?
+====
+
+.URI Format
+[NOTE]
+====
+URI = scheme "://" authority "/" path ["?" query]["#" fragment]
+====
+
+URI Design Rules::
+. "/" must be used to indicate a hierarchical relationship between resources. I.e. http://api.y.com/shapes/polygons/squares
+. No trailing "/" should be included. Should be ignored if it is included.
+. "-", hyphens, should be used to improve readability.
+. Avoid underscore, "_".
+. Use lowercase letters for URI paths.
+. File extensions should not be used in URIs.
+
+URI Authority Design::
+. Consistent sub-domain names.
+. Consistent sub-domain names for client developer portal. Many REST APIs have an associated website, known as a developer portal, to help on-board new clients with documentations, forums, and self-service provisioning of secure API access keys. I.e. http://developer.restapi.org .
+
+Resource Modeling::
+The hierarchy of resource models is represented by the URI path. The segments of the paths separated by "/" correspond to a unique resource.
+
+Resource Archetypes:::
+A REST API is composed of four distinct resource archetypes: document, collection, store and controller.
+
+Document::::
+A #document# resource is a singular concept that is akin to an object instance or database record, which can have fields with values and links to other related resources.
+
+Collection::::
+A #collection# resource is a server-managed directory of resources. It's the server's role to decide whether or not to add a new resource if ever requested by a client.
+
+Store::::
+A #store# is a client managed resource repository. A resource can be put into the store, be retrieved or deleted. But stores do not create new resources.
+
+NOTE: PUT /users/1234/membership
+
+Controller::::
+A controller is an action that a client can perform. Controller names should appear as the last segment in the URI path.
+
+NOTE: POST /notes/12345/alarm
+
+== REST API URI Path Design
+
+.#WRML# URI Pattern
+[NOTE]
+====
+{collection}/{store}/{document}
+Collection contains stores which keep documents.
+====
+
+. Document names - #singular noun#
+. Collection names - #plural noun#
+. Store names - #plural noun#
+. Controller - verbs
+. Path variable segments can be substituted with ID based values. I.e. http://api.foo.com/sportclubs/{clubId}/members/{memberId}
+. Avoid CRUD function names in URIs.
+
+== URI Query Design
+
+.URI Query Patterm
+[NOTE]
+====
+URI = scheme "://" authority "/" path [ "?" query ] [ "#" fragment ]
+
+http://api.foo.com/orders/order12345/ship?delivery=ground
+====
+
+. Query can be used to filter collections and stores.
+. Query can be used to paginate. I.e. GET /orders?pageStart=100&pageSize=50
+
+== Interaction Design
+. GET for retrieving resource
+. HEAD for retrieve response headers only
+. PUT to insert or update
+. POST to create new resources in #collection#
+. POST to execute #controller#
+. DELETE to remove resource
+
+== Typical Response Code
+Use specific response code.
+
+. 200 - OK, for non-specific success
+. 201 - Created
+. 202 - Accepted
+. 204 - No content, for PUT, POST and DELETE.
+. 301 - Moved permanently
+. 400 - Bad request
+. 401 - Unauthorized
+. 403 - Forbidden
+. 404 - Not found
+
+== Meta Data Design
+. Use Content-Type
+. Use Content-Length
+. Use Last-Modified
+. ETag for responses
+. Media Types
+
+== Versioning
+
+Versioning when there are changes in::
+. format of response data
+. type of response
+. removal of any part of API
+
+Versioning options::
+. URI versioning. I.e., http://api.foo.com/v1
+. Request Header - custom header like Accept-version
+. Vendor specific accept header. I.e. Accept: application/vnd.example+json;version=1.0
+
+
+== GitHub API
+Good example for API design.
+

@@ -1,0 +1,240 @@
+= Effective Java
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+== Java Visibility
+=== Same Package Different Jars
+Library JAR::
+This library JAR has the following package structure
+....
+.
+|-src
+|---main
+|-----java
+|-------y
+|---------w
+|-----------People.java
+....
+
+....
+class People                // <1>
+{
+    String name;            // <2>
+    private int age;        // <3>
+    protected String city;  // <4>
+}
+....
+<1> class People is Package scope
+<2> name is also Package scope
+<3> age is Private
+<4> city is Protected
+
+Another project as below:
+....
+.
+|-src
+|---main
+|-----java
+|-------y
+|---------w
+|-----------UsePeople.java
+|-----------z
+|-------------UsePeople2.java
+....
+
+The visibility is as below
+....
+package y.w;
+// Not even need an import statement here. They are in the same package
+class UsePeople
+{
+    private People people;
+
+    public void test()
+    {
+        System.out.println(people.name); // OK - sees name as Package scope
+        System.out.println(people.city); // OK - sees city as Protected scope
+        System.out.println(people.age);  // Fail - Private not visible
+    }
+}
+....
+
+....
+package y.w.z;
+import y.w.People; // Fail - can't see People at all
+public class UsePeople2
+{
+    private People people;
+
+    public void test()
+    {
+        System.out.println(people.name); // Fail - can't see People at all
+        System.out.println(people.city); // Fail - can't see People at all
+        System.out.println(people.age);  // Fail - can't see People at all
+    }
+}
+....
+
+== Service Provider Interface (SPI)
+Service::
+A set of programming interfaces and classes that provide access to some specific application functionality or feature. The service can define the interfaces for the functionality and a way to retrieve an implementation. In the word-processor example, a dictionary service can define a way to retrieve a dictionary and the definition of a word, but it does not implement the underlying feature set. Instead, it relies on a service provider to implement that functionality.
+
+Service provider interface (SPI)::
+The set of public interfaces and abstract classes that a service defines. The SPI defines the classes and methods available to your application.
+
+Service Provider::
+Implements the SPI. An application with extensible services enable you, vendors, and customers to add service providers without modifying the original application.
+
+Java provides some SPI::
+* CurrencyNameProvider: provides localized currency symbols for the Currency class.
+* LocaleNameProvider: provides localized names for the Locale class.
+* TimeZoneNameProvider: provides localized time zone names for the TimeZone class.
+* DateFormatProvider: provides date and time formats for a specified locale.
+* NumberFormatProvider: provides monetary, integer and percentage values for the
+
+.Service Interface
+....
+package y.w.services
+public interface BankAccount
+{
+    public double getBalance();
+}
+....
+
+.Service Implementation by Service Provider
+....
+package y.w.services
+public class CheckAccount implements BankAccount
+{
+    @Override
+    public double getBalance() { return 1.0; }
+}
+....
+
+.Hook it to Service Provider Framework
+....
+Create file named:
+META-INF/services/y.w.services.BankAccount
+
+which has contents
+package y.w.services.CheckAccount
+....
+
+.Or, Our Own Service Provider
+....
+public BankAccountService
+{
+    private static BankAccountService service;
+    private ServiceLoader<BankAccount> loader;
+
+    private BankAccountService() // No instance can be instantiated outside.
+    {
+        loader = ServiceLoader.load(BankAccount.class);
+    }
+
+    // Using static method to get a singleton service instance.
+    public static synchronized BankAccountService getService()
+    {
+        if (service == null)
+            service = new BankAccountService();
+        return service;
+    }
+
+    public double getBalance()
+    {
+        Iterator<BankAccount> accounts = loader.iterator();
+        double balance = 0;
+        while (accounts.hasNext())
+            balance += accounts.next.getBalance();
+
+        return balance;
+    }
+}
+....
+
+== Skeletal Implementation
+The #Skeletal Implementation# is a design pattern. It defines an abstract class which provides partial interface implementation. Java provides quite some of it. For example, AbstractCollection, etc.
+
+Be noted that Java 8 enhanced interfaces with default method implementations, which alleviate the problems that skeletal implementation tries to address.
+
+See project #java8# for example in package #y.w.effectivejava.skeletal#.
+
+.Diamond Issue
+[WARNING]
+====
+interface A { void foo(); }
+interface B extends A { void foo(); }
+interface C extends A { void foo(); }
+interface D implements B, C { void foo(); }
+
+      A
+     / \
+    /   \
+    B   C
+     \ /
+      D
+
+Method foo() in D conflict.
+====
+
+== Use Interface to ONLY Define Types
+. Interface serves as #type#.
+. Interface serves as a #contract#.
+. Classes that implements interfaces fulfils the contract.
+. Classes represent what an instance will do for the client, based on the contract.
+
+[WARNING]
+====
+It's bad practice to use so called #CONSTANT INTERFACE#, which has no methods but static final constant fields.
+
+Reason? Constants are implementation details.
+====
+
+.Choices for Exposing Constants
+[NOTE]
+====
+. If constants are strongly tied to class or interface, add them to the class or interface. I.e. Integer.MIN_VALUE.
+. Use enum type.
+. Use noninstantiable utility class. I.e. PaymentsConstants is one of such.
+====
+
+== Generic Type
+....
+Set<String> ss = new HashSet<>(); // OK
+Set<?> sq = ss;                   // OK
+Set<Object> so = ss;              // Not OK. String is not Set<String> is not Set<Object>
+Set sr = ss;
+
+(sq instanceof Set<?>)           // OK
+(sq instanceof Set)              // OK
+(sq instanceof Set<Object>)      // <1> Not OK. Generic type is ERASED. It's illegal to use instanceof on parameterized type
+....
+<1> Generic type is erased during runtime. So operator instanceof can't work with generic types.
+
+=== Suppress Warning
+
+....
+@SuppressWarnings("unchecked") // It's safe to suppress the warning here, blahblah
+....
+
+=== Prefer List to Array
+. Array is #covariant#, which means, if Sub extends Super, then Sub[] #is subtype# of Super[].
+. Generics is #invariant#, which means, List<Type1> is neither super type nor subtype of List<Type2>, disregarding the relationship between Type1 and Typ2. For example,  Box<Integer> and Box<Double> are not subtypes of Box<Number> even though Integer and Double are subtypes of Number.
+. Arrays enforce element types at runtime.
+. Generics enforce element types at compilation time. Generic type is erased at runtime.
+
+=== Bounded Wildcard
+For maximum flexibility, use wildcard types on input parameters that represent producers or consumers.
+
+. Producers - the collection which provides data of type E.
+. Consumers - the collection which consumes data of type E.
+. #PECS# - Producer-Extends and Consumer-Super. This is also called Get and Put Principle.
+
+[TIP]
+====
+. Do not use wildcard types as return types. Otherwise, wildcard types will be forced in client code.
+. If the user of a class has to think about wildcard types, then there is something wrong with the class's API.
+====
+

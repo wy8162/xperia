@@ -1,0 +1,55 @@
+= Mockito
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+== Mock vs Spy
+* If you want to be safe and avoid calling external services and just want to test the logic inside of the unit, then use mock.
+* If you want to call external service and perform calling of real dependency, or simply say, you want to run the program as it is and just stub specific methods, then use spy.
+* Spy has real method call.
+
+== doReturn vs thenReturn
+Mockito can define what to be returned when a method is called. There are a couple ways to do it. Sometimes, it is a little bit confusing on which one to use.
+
+#when-thenReturn#::
+* has better readability.
+* is type safe - thenReturn parameter is typed.
+* *AVOID* using it for Spy because #when# takes parameter which calls methods. Calling a method means calling real method.
+
+#doReturn-when or doNothing-when#::
+* doReturn parameter is Object. There is no type checking in compile time.
+* used for Spy because #when# only takes object instance and not call real method.
+* use #doNothing-when" when stubbing void method.
+
+....
+User user = Mockito.mock(User.class);
+
+when(user.getName()).thenReturn("Yang");  // <1>
+
+doReturn(1).when(user).getName();         // <2>
+....
+<1> thenReturn has to take String.
+<2> doReturn takes Object. So no compilation error here.
+
+....
+User user = Mockito.spy(new User()));
+
+when(user.getName()).thenReturn("Yang");  // <1>
+
+doReturn("Yang").when(user).getName();         // <2>
+....
+<1> DON'T do this because "user.getName()" calls real method.
+<2> Good. "when(user)" doesn't call real method.
+
+== Suppress Calling Super Method
+
+....
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ MockitoTest.User.class, MockitoTest.Customer.class})
+public class MockitoTest
+{
+    PowerMockito.suppress(PowerMockito.method(User.class, "getName")); // <1>
+}
+....
+<1> User is the parent class which has method "getName".

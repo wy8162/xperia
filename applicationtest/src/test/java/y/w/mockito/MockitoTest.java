@@ -5,16 +5,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ MockitoTest.User.class, MockitoTest.Customer.class})
 public class MockitoTest {
     class AClass {
         private int number;
@@ -51,7 +56,7 @@ public class MockitoTest {
     private ArrayList<String> mockList;
 
     @Spy
-    private ArrayList<String> spyList;
+    private List<String> spyList = new ArrayList<>();
 
     @Test
     @SuppressWarnings("unchecked")
@@ -89,5 +94,41 @@ public class MockitoTest {
         doReturn(expected).when(spyList).get(100);
 
         assertEquals(expected, spyList.get(100));
+    }
+
+    @Test
+    public void testThenReturnVsDoReturn()
+    {
+        User user = Mockito.mock(User.class);
+
+        when(user.getName()).thenReturn("Yang");         // thenReturn has type checking.
+
+        doReturn(1234).when(user).getName(); // doReturn takes Object as parameter. Not type safe.
+    }
+
+    @Test
+    public void testSupressSuperMethod()
+    {
+        Customer customer = Mockito.spy(new Customer());
+
+        PowerMockito.suppress(PowerMockito.method(User.class, "getName"));
+
+        assertTrue(customer.getName().startsWith("Customer."));
+    }
+
+    class User
+    {
+        private String name;
+
+        public String getName() { return name;}
+        public void setName(String name) { this.name = name; }
+    }
+
+    class Customer extends User
+    {
+        public String getName()
+        {
+            return "Customer." + super.getName();
+        }
     }
 }

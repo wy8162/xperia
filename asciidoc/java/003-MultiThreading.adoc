@@ -8,3 +8,213 @@ There are self-contained Groovy sample programs testing various Groovy GPAR Acto
 
 The tests can be found under #java8/src/test/groovy/y.w.concurrency#.
 
+http://tutorials.jenkov.com/java-concurrency[Java Concurrency] has excellent details about Java Concurrency.
+
+== Volatile Variable
+
+The best document about Java Volatile Keyword I read so far is http://tutorials.jenkov.com/java-concurrency/volatile.html[Java Volatile Keyword]. Book #Java Concurrency in Practice (Brian Goetz)# also has excellent details about it.
+
+The following are some highlights from http://tutorials.jenkov.com/java-concurrency/volatile.html[Java Volatile Keyword].
+
+. If Thread A writes to a volatile variable and Thread B subsequently reads the same volatile variable, then all variables visible to Thread A before writing the volatile variable, will also be visible to Thread B after it has read the volatile variable.
+. If Thread A reads a volatile variable, then all all variables visible to Thread A when reading the volatile variable will also be re-read from main memory.
+
+.Impact to visibility when write volatile variable
+....
+public class MyClass {
+    private int years;
+    private int months
+    private volatile int days;     // <1>
+
+
+    public void update(int years, int months, int days){
+        this.years  = years;       // <2>
+        this.months = months;
+        this.days   = days;        // <3>
+    }
+}
+....
+<1> days is a volatile variable. It's visibility is guaranteed.
+<2> years amd months also get written to memory when days is saved next.
+<3> The full volatile visibility guarantee means, that when a value is written to days, then all variables visible to the thread are also written to main memory. That means, that when a value is written to days, the values of years and months are also written to main memory.
+
+.Impact to visibility when read volatile variable
+....
+public class MyClass {
+    private int years;
+    private int months
+    private volatile int days;
+
+    public int totalDays() {
+        int total = this.days;  // <1>
+        total += months * 30;
+        total += years * 365;
+        return total;
+    }
+....
+<1> the totalDays() method starts by reading the value of days into the total variable. When reading the value of days, the values of months and years are also read into main memory. Therefore you are guaranteed to see the latest values of days, months and years with the above read sequence.
+
+This should be the result of CPU cache policies, leveraged by JVM memory model.
+
+== Atomic Operations
+
+. Writing to variables is atomic EXCEPT long and double.
+. Reading from a variable is atomic EXCEPT long and double.
+. Java has atomic types like AtomicInteger, AtomicBoolean, AtomicLong, etc.
+
+== Concurrent Collections
+
+Java collections framework is generally not thread safe with the exception of those old Vector, etc. With that being said, Java does provide concurrent versions of collections.
+
+. ConcurrentMap
+. ConcurrentHashMap
+. ConcurrentLinkedDeque
+. ConcurrentLinkedQueue
+. ConcurrentNavigableMap
+. etc
+
+=== Synchronization
+
+Java synchronization, i.e., #synchronized#, has two effects
+. Guarantee reliable communication - shared data is consistent.
+. Mutual exclusion - reading and writing by different threads will not be interleaved.
+
+Hoisting - can cause liveness failure::
+Hoisting is kind of code optimization which might change the order of code.
+
+For example:
+....
+boolean shouldStop = false;
+
+while(!shouldStop)
+{
+    do something
+}
+....
+
+might become the following after it is hoisted:
+....
+if (!shouldStop)
+    while(true)
+        do something
+....
+
+#The rescue?#: synchronize the code block or method.
+
+== Synchronized or Not, with or without Volatile
+
+.Synchronzied version
+[source,java]
+====
+class Worker implements Thread
+{
+    public static boolean shouldStop = false;
+
+    private static synchronzied void requestStop()  // <1>
+    {
+        shouldStop = true;
+    }
+
+    private static synchronized void stopRequested() // <2>
+    {
+        return shouldStop;
+    }
+
+    public void run()
+    {
+        while (!stopRequested())
+        {
+            // get some work from the master to do.
+        }
+    }
+}
+
+class Master implements Thread
+{
+    public void run()
+    {
+        while (if there is work to do)
+        {
+            // Send work to Worker
+        }
+
+        // Done my mission
+        Worker.requestStop();
+    }
+}
+====
+<1> synchronized writing to variable shouldStop
+<2> synchronized reading from variable shouldStop
+
+Synchronizing writing is not enough. It's not because the reading and writing is not atomic. It is atomic to read and write boolean variable. The point is for reliable communication, which makes sure the value being written is what being read.
+
+.Simplified with Volatile - without synchronizing reading and writing volatile variable
+[source,java]
+====
+class Worker implements Thread
+{
+    public static volatile shouldStop = false; // <1>
+
+    public void run()
+    {
+        while (!shouldStop)
+        {
+            // get some work from the master to do.
+        }
+    }
+}
+
+class Master implements Thread
+{
+    public void run()
+    {
+        while (if there is work to do)
+        {
+            // Send work to Worker
+        }
+
+        // Done my mission
+        Worker.shouldStop = true;
+    }
+}
+====
+<1> volatile guarantees that the most recent value written will be read. In the other hand, the atomic read and write is also the reason we can do this.
+
+But the following will fail:
+....
+volatile int counter = 0;
+
+thread1:
+    counter++
+
+thread2:
+    myCounter = counter;
+....
+
+In this case, the read and write must be synchronized. This is because the "++" is NOT atomic.
+
+So to do without synchronizing:
+. the variable is declared volatile
+. the writing to the variable must be atomic
+
+#The rescue if you really hate to synchronizing the code?#: use atomic variables, say, AtomicBoolean or AtomicInteger.
+
+== Best Practices
+
+. Synchronize the critical code.
+. Share immutable data.
+. Minimize sharing mutable data if it can't be avoided.
+. Use atomic variables.
+. #Effectively immutable# - share the data after it is created and will not be modified again. But sharing the reference to the effectively immutable data still needs to be synchronized or be shared in a thread safe way.
+. Avoid excessive synchronization. Excessive synchronization will cause liveness issue, slow performance, slow response, deadlock, etc.
+. Yield the control it is idle so that not to waste CPU resources.
+. Do as little work as possible inside synchronized / locked region.
+. Use Executors and Tasks instead of Thread.
+. Thread.stop is not safe. Don't call it.
+. Use concurrent collections, Map and List.
+. Use concurrentHashMap in preference to Collections.synchronizedMap.
+. Use BlockingQueue to implement publisher/subscriber architecture.
+. Use CountDownLatch to coordinate threads work - all threads calling CountDownLatch.await() will wait until the waiting threads reach the pre-set number when CountDownLatch is built.
+. Use CyclicBarrier to coordinate tasks.
+. Avoid ThreadGroup - not safe and obsolete.
+. Document thread safety.

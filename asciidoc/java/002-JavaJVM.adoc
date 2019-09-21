@@ -48,3 +48,32 @@ The young generation is divided into three spaces:
 . One #Eden# space
 . Two #Survivor# spaces
 
+== VisualJVM
+. Monitors Java processes locally and remotely
+. Overview shows JVM configurations and environments
+. Monitors performance and memory
+. Monitors threads
+. Profile Java classes
+. Profile JDBC SQL queries
+. Take and browse snapshots, core dumps, thread, heap dumps, etc.
+. Analyz core dumps, thread dumps
+. OQL - Object Query Language can be used to explore objects, which can help identify abnormalities.
+. Many plugins to expand the functionalities.
+. Visual GC can shows Young / Eden and old generations visually. Run the application continuously and the changes in class loader time, GC time, Eden Space, Survivor 0 and 1 spaces, Old Gen and metaspace can be shown dynamically.
+. Thread Inspector shows thread details, fields, references, and hierarchies.
+
+.Visual GC
+image::images/visual_gc.png[]
+
+.Thread Inspector
+image::images/thread_inspector.png[]
+
+.Thread Details
+image::images/thread_details.png[]
+
+== JConsole
+JConsole is included in JDK. It can be used to monitor Java applications including application servers like Weblogic.
+
+== Intellij Profiler
+It only supports Linux and MacOS.
+

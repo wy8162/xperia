@@ -1,0 +1,13 @@
+= Dynamic Programming
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: My Content
+
+Dynamic Programming can be used to solve many problems in time O(n^2^) or O(n^3^) for which a naive approach would take exponential time.
+
+A problem can be solved by Dynamic Programming must have the following two properties:
+. The problem can be divided into smaller sub-problems until the sub-problem becomes so trivial that it can be resolved instantly. This means the problem can be resolved recursively.
+. Solving larger sub-problems will re-use the result of the smaller sub-problems. This means that the results of smaller problems can be memoized so that they don't need to be calculated again. The key is to resolve the problem in bottom up manner.
+
+== Longest Common Subsequence (LCS)
