@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 References: http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html
 

@@ -1,21 +1,48 @@
-= Learn the Advanced Technologies
-This is all about SEPA Integration Test
-:sectnums:
-:toc:
-:toclevels: 4
-:toc-title: My Content
+= Study Notes
+:description: Yang Wang's Study Notes
+:keywords: java, sql, ddd, spring, spring boot, cucumber, junit, web, controller, advice, restful, soap, ioc, di, ejb, entity, testing, algorithm, lcs, thread, jvm, memory. domain, design, servlet, http, request, response, formatter, property editor
+:page-layout: docs
+:page-description: {description}
+:page-keywords: {keywords}
+:rainbow-themes: pass:quotes[[red]##t##[green]##h##[purple]##e##[fuchsia]##m##[blue]##e##[teal]##s##]
 
-:description: Example AsciiDoc document
-:keywords: AsciiDoc
-:imagesdir: ./img
+Algorithms::
+* link:algorithm/001-DynamicProgramming[Dynamic Programming]]
 
+Database::
+. link:database/001-MySQL[MySQL]
 
-== Project Web
-Mainly demonstrate how to build a web page with Spring Boot.
+Java::
 
-== Project Restful
-Mainly demonstrate how to develop RESTful services.
+. link:java/000-EffectiveJava[Effective Java]
+. link:java/001-JavaPerformance[Java Performance]
+. link:java/002-JavaJVM[Java JVM]
+. link:java/003-MultiThreading[Multi-Threading]
+. link:java/004-XML[XML]
+. link:java/005-JavaProxy[Java Proxy]
+. link:java/006-Mockito[Mockito]
 
+Spring Framework::
+* link:spring-framework/01-Spring-ApplicationWebContext[Spring ApplicationWebContext]
+* link:spring-framework/02-Spring-ControllerAdvice[Spring ControllerAdvice]
+* link:spring-framework/03-Spring-PathMatching[Spring Path Matching]
+* link:spring-framework/04-Spring-PathMatcher[Spring Path Matcher]
+* link:spring-framework/05-Spring-MVC-WebApplication[Spring MVC Web Application]
+* link:spring-framework/06-Spring-RESTfulSecurity[Spring RESTful Security]
+* link:spring-framework/20-HttpRequestResponse[Http Request and Response]
+* link:spring-framework/21-ServletAPI[Servlet API]
+* link:spring-framework/30-Java_DateTime[Java DateTime]
+* link:spring-framework/40-Test-Cucumber[Test Cucumber]
+* link:spring-framework/50-Spring-IoC_Container[Spring IoC Container]
+* link:spring-framework/51-Spring-Resources[Spring Resources]
+* link:spring-framework/52-Spring-Validation_DataBinding_TypeConversion[Spring Validation DataBinding Type Conversion]
+* link:spring-framework/53-Spring-SpEL[Spring SpEL]
+* link:spring-framework/54-Spring-DataAccess[Spring DataAccess]
+* link:spring-framework/55-Spring-Spring_Testing[Spring Spring Testing]
+* link:spring-framework/56-EntityMapping[Entity Mapping]
 
-
+Payments::
+. link:payments/001-ISO20022_vs_SWIFT[ISO20022 vs SWIFT]
+. link:payments/002-SEPA[SEPA]
+. link:payments/003-SWIFT[SWIFT]
 

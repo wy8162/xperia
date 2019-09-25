@@ -1,0 +1,79 @@
+= Domain Driven Design
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+== Steps to Work on DDD
+. Working closely with domain experts to define the big picture of business requirements - the domain or the problem space.
+. Decompose business domain into logical sub-domains. These sub-domains group the related business knowledge, processes, etc. Domain or sub-domains are also called problem spaces.
+. Use Ubiquitous Language to define common terminologies and communications.
+. Create bounded-context for sub-domains.
+. Ideally, different teams will work on bounded-context independently. One team can work on more than one bounded-context. But no bounded-context should be worked on by more than one team.
+. Bounded-contexts are self contained and are free to be changed without impacting each others.
+. Identify the #shared kernel#, which are the cross-cutting concerns between bounded-contexts.
+. Focus on the domain's behaviors instead of #data# or
+
+== Components
+Ubiquitous Language::
+It is to define a ubiquitous language that users, developers, etc can speak the same language for better communication. The language will provide the agreed vocabularies to define domains, name classes and variables, etc.
+
+Domain::
+A domain is a logic division of the problem spaces. It represents the problems to be addressed by the software development, "a sphere of knowledge or activity".
+
+Bounded Context::
+A description of boundary, typically a subsystem, within which a particular model is defined and applicable.
+
+Building Blocks::
+. Entity - the unique things. in Java terms, it is a POJO with a unique identity (ID). It is usually mutable. Entity is identified by the ID instead of attributes. So two entities with the same ID are considered equal disregarding the possible different attributes, which is bad if it ever happens.
+. Value Object - they are simply values, which is immutable object that has attributes, but no distinct identity. Value objects are equal only when the attributes are equal. There is no unqiue ID associated with value objects. Value objects are not things. They are metrics.
+. Domain Event - an object that is used to record a discrete event related to model activity within the system.
+. Aggregate root - first, an aggregate root is an entity. It is a cluster of entities and value objects with defined boundaries around the group, which is being treated as a single unit. Rather than allowing every single entity or value object to perform all actions on its woen, the collective aggregate of items is assigned a sigular aggregate root item. The external objects won't have direct access to individual entity or object within the aggregate. They will have access to the single aggregate root item, which will pass along instructions to the group as a whole. For example, the relationship between Order and OrderLineItem within SalesOrderDomain can be considered as an aggregate where Order acts as the aggregate root, while the OrderLineItem is the child of Order within SalesOrder boundary.
+. Service - A service is an operation or business logic that doesn't naturally fit within the realm of objects. In the other words, if some functionalities must exist but can't be related to an entity or value object, it's probably a service.
+. Repository - service or function to store and access to objects.
+. Factory - DDD encourgae using factory methods to create complex aggregate objects.
+
+NOTE: All operations within the domain should, where possible, go through an aggregate root. Factories, repositories, and services are some exceptions to this, but whenever possible, if you can create or require that an operation goes through the aggregate root, that’s going to be better.
+
+NOTE: A factory can also potentially return an aggregate root or an entity, or perhaps a value object.
+
+.Quote from Martin Folwer
+[NOTE]
+....
+Aggregate is a pattern in Domain-Driven Design. A DDD aggregate is a cluster of domain objects that can be treated as a single unit. An example may be an order and its line-items, these will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate.
+
+An aggregate will have one of its component objects be the aggregate root. Any references from outside the aggregate should only go to the aggregate root. The root can thus ensure the integrity of the aggregate as a whole.
+
+Aggregates are the basic element of transfer of data storage - you request to load or save whole aggregates. Transactions should not cross aggregate boundaries.
+
+DDD Aggregates are sometimes confused with collection classes (lists, maps, etc). DDD aggregates are domain concepts (order, clinic visit, playlist), while collections are generic. An aggregate will often contain mutliple collections, together with simple fields. The term "aggregate" is a common one, and is used in various different contexts (e.g. UML), in which case it does not refer to the same concept as a DDD aggregate.
+....
+
+|===
+|Item |Has Data |Has Logic |Has ID
+
+|Data Transfer Object (DTO)
+|Yes
+|No
+|No
+
+|Value Object
+|Yes
+|Yes
+|No
+
+|Entity
+|Yes
+|Yes
+|Yes
+|===
+
+
+Architecture::
+DDD use layered architecture.
+
+. Presentation layer - knows the application and domain layers. Calls applcation use cases.
+. Application layer - knows only the domain layer.
+. Domain layer - knows nothing about the other layers.
+. Infrastructure layer - knows only domain layer.
+

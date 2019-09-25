@@ -3,7 +3,7 @@ This is all about SEPA Integration Test
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 https://www3.ntu.edu.sg/home/ehchua/programming/sql/SampleDatabases.html[My SQL Sample Databases]
 

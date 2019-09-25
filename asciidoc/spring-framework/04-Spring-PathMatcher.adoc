@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 Usually, by default, given a RESTful request with the following URI
 

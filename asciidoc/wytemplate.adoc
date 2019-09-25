@@ -5,7 +5,7 @@ This is all about SEPA Integration Test
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 :description: Example AsciiDoc document
 :keywords: AsciiDoc
@@ -30,9 +30,9 @@ monospace italic `_constrained_` & ``__un__``constrained
 monospace bold italic `*_constrained_*` & ``**__un__**``constrained
 
 == Inbound
-Yang Wang <yang.wang1@fiserv.com>
+Yang Wang <wy8162@gmail.com>
 
-The purpose of this work order is to backport the changes we made for SEPA Compliance 2019 for EBA Step2 from default Envoy to HSBC. There is no change to the design accept for the estimates and tasks list. C&P is a copy and paste task. Graft is a manual graft task. Use the original task listed as a baseline for how to do the new tasks.
+The purpose of this work order is to backport the changes we made for SEPA Compliance 2019 for EBA Step2.
 
 * *camt.027*: claim inquiry
 ** Inbound from IP
@@ -68,7 +68,7 @@ The purpose of this work order is to backport the changes we made for SEPA Compl
 
 == Outbound
 
-The purpose of this work order is to backport the changes we made for SEPA Compliance 2019 for EBA Step2 from default Envoy to HSBC. There is no change to the design accept for the estimates and tasks list. C&P is a copy and paste task. Graft is a manual graft task. Use the original task listed as a baseline for how to do the new tasks.
+The purpose of this work order is to backport the changes we made for SEPA Compliance 2019.
 
 == Implementation
 [source,java, numbered]

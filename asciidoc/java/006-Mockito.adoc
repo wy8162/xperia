@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 == Mock vs Spy
 * If you want to be safe and avoid calling external services and just want to test the logic inside of the unit, then use mock.

@@ -1,0 +1,30 @@
+= Comparison of Algorithms
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+
+|===
+|Name |Best |Average |Worst
+
+|Quicksort
+|n log(n)
+|n log(n)
+|n^2^
+
+|Merge Sort
+|n log(n)
+|n log(n)
+|n log(n)
+
+|Heap Sort
+|n or n log(n)
+|n log(n)
+|n log(n)
+
+|Insertion Sort
+|n
+|n^2^
+|n^2^
+|===

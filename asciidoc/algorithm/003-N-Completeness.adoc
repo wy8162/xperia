@@ -1,0 +1,9 @@
+= N-Completeness
+:sectnums:
+:toc:
+:toclevels: 4
+:toc-title: Table of Contents
+
+There are some computational problems which cannot be resolved by computers. For example, Turing Halting problem, Alan Turing problem, etc.
+
+NP complete problems are problems whose status is unknown.

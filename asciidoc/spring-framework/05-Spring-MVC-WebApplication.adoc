@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 == Project Structure
 image::images/WebAppProjectStructure.png[Project Structure]

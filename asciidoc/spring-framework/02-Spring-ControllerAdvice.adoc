@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 Exception handling is another type of cross cut concern.  [blue white-background]#@ControllerAdvice# is used to handle [blue white-background]#@ExceptionHandler# , [blue white-background]#@InitBinder#, and [blue white-background]#@ModelAttribute#.
 

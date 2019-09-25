@@ -15,7 +15,7 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  * ContextLoaderListener.
  *
  * The interface implemented by AbstractAnnotationConfigDispatcherServletInitializer is WebApplicationInitializer, which
- * is recognized by SpringServletContainerInitializer, which in turn implements ServletContaierInitializer, which is
+ * is recognized by SpringServletContainerInitializer, which in turn implements ServletContainerInitializer, which is
  * then recognized by Servlet 3.0+ container.
  *
  * To achieve that, file META-INF/services/javax.servlet.ServletContainerInitializer must contain

@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 ==== LocalDateTime
 LocalDateTime java.time.LocalDateTime is strictly not a part of the set of classes responsible for time zones handling. However, it will be, in most likelihood, the class on top of which time zones will be added on majority of occasions (except those few cases where instances of java.time.Instant are being used). Hence, its importance!

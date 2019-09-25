@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 https://stackoverflow.com/questions/18205436/spring-mvc-spring-security-login-with-a-rest-web-service[Spring MVC + Spring Security login with a rest web service]
 

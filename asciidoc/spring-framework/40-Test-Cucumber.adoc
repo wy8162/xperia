@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 == Structuring Cucumber BDD
 Project Weathertracker has a complete sample for Cucumber tests.

@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Contentvs
+:toc-title: Table of Contents
 
 The dot in the path variable at the end of URI causes two unexpected behaviors, unexpected to those who are not familiar to the huge number of Spring configuration properties.
 

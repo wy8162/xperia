@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 == Understanding Java Garbage Collection
 https://www.cubrid.org/blog/understanding-java-garbage-collection[Understanding Java Garbage Collection]

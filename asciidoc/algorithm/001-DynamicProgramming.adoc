@@ -2,7 +2,7 @@
 :sectnums:
 :toc:
 :toclevels: 4
-:toc-title: My Content
+:toc-title: Table of Contents
 
 Dynamic Programming can be used to solve many problems in time O(n^2^) or O(n^3^) for which a naive approach would take exponential time.
 
