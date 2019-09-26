@@ -24,7 +24,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor // needed for JSON and JPA
 @Setter
 @Getter
-public final class CourseRecord
+public class CourseRecord
 {
     @Id
     @GeneratedValue

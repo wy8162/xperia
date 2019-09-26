@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PACKAGE) // needed for JSON and JPA
 @Setter(value = AccessLevel.PACKAGE)
 @Getter
-public final class Course
+public class Course
 {
     @Id
     @Column(name="COURSE_ID")

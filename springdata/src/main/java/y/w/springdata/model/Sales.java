@@ -21,11 +21,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name="SALES")
+@Table(name="Sales")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class Sales
+public class Sales
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

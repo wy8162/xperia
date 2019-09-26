@@ -2,6 +2,7 @@ package y.w.springdata.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import y.w.springdata.model.Student;
 import y.w.springdata.model.dto.StudentCourseRatingDTO;
 import y.w.springdata.model.dto.StudentDTO;
@@ -20,4 +21,7 @@ public interface StudentRepository extends CrudRepository<Student, Long>
 
     @Query("SELECT new y.w.springdata.model.dto.StudentDTO(s.id, s.name) FROM Student s")
     List<StudentDTO>  findAllStudent();
+
+    // Uses the @NamedQuery defined in y.w.springdata.model.Student
+    List<Student> fetchByName(@Param("name") String name);
 }

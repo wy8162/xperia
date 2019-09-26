@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+    <persistence-unit name="TestPersistence" transaction-type="RESOURCE_LOCAL">
+        <class><!-- Entity Manager Class Name --></class>
+        <properties>
+            <property name="javax.persistence.jdbc.driver" value="Database Driver Name" />
+            <property name="javax.persistence.jdbc.url" value="Database Url" />
+            <property name="javax.persistence.jdbc.user" value="Database Username" />
+            <property name="javax.persistence.jdbc.password" value="Database Password" />
+        </properties>
+    </persistence-unit>
+</persistence>
