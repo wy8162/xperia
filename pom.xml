@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cucumber.version>4.7.1</cucumber.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.9.10</jackson.version>
         <assertj-core.version>3.13.2</assertj-core.version>
         <assertj-json>1.2.0</assertj-json>
         <junit.version>4.12</junit.version>
