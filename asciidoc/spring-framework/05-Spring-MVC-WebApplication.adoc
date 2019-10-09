@@ -75,7 +75,7 @@ Root application context is the parent context of Web Application Context, which
 
 Web application context is the child context of the root application context. It has all the beans used by a particular DispatcherServlet.
 
-If the application is simple and there are not so many beans, then one web application context might be enoguh. In this case, there is no need to create a root application context.
+If the application is simple and there are not so many beans, then one web application context might be enough. In this case, there is no need to create a root application context.
 
 [source,java]
 ----

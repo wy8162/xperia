@@ -6,6 +6,8 @@
 
 Exception handling is another type of cross cut concern.  [blue white-background]#@ControllerAdvice# is used to handle [blue white-background]#@ExceptionHandler# , [blue white-background]#@InitBinder#, and [blue white-background]#@ModelAttribute#.
 
+NOTE: @ModelAttribute annotation is used to bind a method parameter or a method return value to a named model attribute. It can be used either on methods or on method parameters.
+
 == Exception Handler
 
 Instead of adding exception handling everywhere in controllers, we can define exception handlers in either the controller or as a controller advice.
