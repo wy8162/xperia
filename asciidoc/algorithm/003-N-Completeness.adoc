@@ -7,3 +7,5 @@
 There are some computational problems which cannot be resolved by computers. For example, Turing Halting problem, Alan Turing problem, etc.
 
 NP complete problems are problems whose status is unknown.
+
+. P - problems can be resolved in polynomial time.
