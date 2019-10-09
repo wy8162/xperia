@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @Import(JavaConfig.class)
 @Profile("test")
-@Sql("classpath:testdata.sql")
+@Sql("classpath:testdata.sql") // load the test data with SQL inserts.
 @Slf4j
 public class StudentServiceTest
 {
