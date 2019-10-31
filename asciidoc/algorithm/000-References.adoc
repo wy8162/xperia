@@ -1,0 +1,9 @@
+# Best Information for Algorithms
+
+- https://web.stanford.edu/class/cs97si/[CS 97SI: Introduction to Programming Contests]
+- http://www-igm.univ-mlv.fr/~lecroq/string/[EXACT STRING MATCHING ALGORITHMS]
+- https://algs4.cs.princeton.edu/home/[Algorithms, 4th Edition]
+- https://introcs.cs.princeton.edu/java/40algorithms/[Algorithms and Data Structures]
+- https://introcs.cs.princeton.edu/python/home/[Introduction to Programming in Python]
+- https://algs4.cs.princeton.edu/code/[Java Algorithms and Clients]
+- https://www.ics.uci.edu/~eppstein/161/960227.html[ICS 161: Design and Analysis of Algorithms]
