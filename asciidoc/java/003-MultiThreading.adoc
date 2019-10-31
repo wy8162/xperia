@@ -17,7 +17,7 @@ The best document about Java Volatile Keyword I read so far is http://tutorials.
 The following are some highlights from http://tutorials.jenkov.com/java-concurrency/volatile.html[Java Volatile Keyword].
 
 . If Thread A writes to a volatile variable and Thread B subsequently reads the same volatile variable, then all variables visible to Thread A before writing the volatile variable, will also be visible to Thread B after it has read the volatile variable.
-. If Thread A reads a volatile variable, then all all variables visible to Thread A when reading the volatile variable will also be re-read from main memory.
+. If Thread A reads a volatile variable, then all variables visible to Thread A when reading the volatile variable will also be re-read from main memory.
 
 .Impact to visibility when write volatile variable
 ....
@@ -197,7 +197,7 @@ So to do without synchronizing:
 . the variable is declared volatile
 . the writing to the variable must be atomic
 
-#The rescue if you really hate to synchronizing the code?#: use atomic variables, say, AtomicBoolean or AtomicInteger.
+#The rescue: if you really hate to synchronizing the code?#: use atomic variables, say, AtomicBoolean or AtomicInteger.
 
 == Best Practices
 

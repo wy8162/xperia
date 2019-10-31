@@ -4,6 +4,38 @@
 :toclevels: 4
 :toc-title: Table of Contents
 
+== Spring Security Architecture
+
+Authencation and Access Control::
+. Who you are
+. What you are allowed to do
+
+....
+public interface AuthenticationManager {
+    Authentication authenticate(Authentication auth) <1>
+     throws AuthenticationException
+}
+....
+<1> will return an Authentication with authenticated=true, or throws AuthenticationException if the principal is invalid or return null if it can't decide.
+
+ProviderManager is the most commonly implementation of AuthenticationManager:
+
+....
+public interface AuthenticationProvider {
+    Authentication authenticate(Authentication auth)
+        throws AuthenticationException;
+
+    boolean supports(Class<?> authentication);
+}
+....
+
+Sometimes, an application can have multiple group of AuthenticationProvider managing logically separated resources like pattern "api/payments/*".
+
+To continue:
+https://spring.io/guides/topicals/spring-security-architecture[Spring Security Architecture].
+
+== Security Samples
+
 https://stackoverflow.com/questions/18205436/spring-mvc-spring-security-login-with-a-rest-web-service[Spring MVC + Spring Security login with a rest web service]
 
 https://stackoverflow.com/questions/20811581/spring-security-login-with-a-rest-web-service[Spring Security login with a rest web service]
@@ -91,7 +123,7 @@ public class CustomUserDetailsService implements UserDetailsService { ... }
 
 . You can define a custom pre-auth filter by extending AbstractPreAuthenticatedProcessingFilter.
 . In your implementation of getPreAuthenticatedPrincipal() method you can check if cookie exists and if it exists return cookie name is principal and cookie value in credentials.
-. Use PreAuthenticatedAuthenticationProvider and provide your custom preAuthenticatedUserDetailsService to check if cookie is vali, if its valid also fetch granted authorities else throw AuthenticationException like BadCredentialsException
+. Use PreAuthenticatedAuthenticationProvider and provide your custom preAuthenticatedUserDetailsService to check if cookie is valid, if its valid also fetch granted authorities else throw AuthenticationException like BadCredentialsException
 . For authenticating user using username/password, add a form-login filter, basic-filter or a custom filter with custom authentication provider (or custom userdetailsService) to validate user/password
 . In case cookie exists, pre auth filter will set authenticated user in springContext and your username./password filter will not be called, if cookie is misisng/invalid, authentication entry point will trigger the authentication using username/password
 

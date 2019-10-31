@@ -20,7 +20,7 @@ https://www.cubrid.org/blog/understanding-java-garbage-collection[Understanding 
 
 Young Generation::
 * Holds newly created objects which soon become unreachable.
-* #Minor GC# - when objects disapear from this area.
+* #Minor GC# - when objects disappear from this area.
 
 Old Generation::
 * Holds objects, #copied here#, reachable and survived from young generation.
@@ -32,6 +32,7 @@ Permanent Generation::
 * #Method area" which holds classes and interned character strings.
 * Not survived from old generation. It is permanent.
 * GC may occur in this area. It's also counted as #Major GC#.
+* Replaced with Metadata Space since Java 8.
 
 .GC Area & Data Flow
 image::images/HotSpotJVM_Generations.png[]
