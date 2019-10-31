@@ -6,54 +6,54 @@
 
 == Performance Tuning Tips
 
-. Don't optimize before you know it's necessary::
+Don't optimize before you know it's necessary - Premature optimization is a typical #anti pattern# - from problem to bad solution::
 * Follow best practices to implement use cases efficiently.
 * Premature optimization takes up a lot of time and makes the code hard to read and maintain.
 * It's waste of time optimizing non-critical parts of applications.
 * Define KPI like Response Per Second (RPS), TPS (Transactions Per Seconf) before optimization.
 * Measure which parts of applications need improve.
 
-. Use Profiler to find the real bottlenet::
+Use Profiler to find the real bottleneck::
 * Based on findings from #1, decide where to start.
 ** Review the source code.
 ** Use Profiler to get details about the behavior and performance of each part of the code.
 ** Focus on the most critical parts first.
 
-. Create a performance test suite for the whole application
+Create a performance test suite for the whole application
 * Define a test performance suite.
 * Always run the suite before and after performance improvement.
 +
 These tests will help identify the functional and performance side effects after changes.
 
-. Work on the biggest bottleneck first::
+Work on the biggest bottleneck first::
 Rather than being tempted to start with quick wins, start from the most significant performance first.
 
 . Use StringBuilder to programmatically add new contents to String::
 * Better performance than StringBuffer
 * But #not thread safe#
 
-. Use "+" to concatenate Strings in one statements
+Use "+" to concatenate Strings in one statements
 * Strings are immutable
 * Compiler will optimize String concatenate like "A" + "B" + "C".
 
-. Use Primitives where possible::
+Use Primitives where possible::
 * Less memory and faster
 
-. Try to avoid BigInteger and BigDecimal
+Try to avoid BigInteger and BigDecimal
 * Occupies more memory and slower than primitives
 
-. Use the right log level
+Use the right log level
 * Avoid creating String messages which ends up being ignored.
 +
 Do this: `if (log.isDebugEnabled()) {....}`
 
-. Use Apache StringUtils.replace instead of String.replace because Apache has better performance.::
+Use Apache StringUtils.replace instead of String.replace because Apache has better performance.::
 
-. Cache expensive resources like database connections::
+Cache expensive resources like database connections::
 
-. Use laziness if possible::
+Use laziness if possible::
 
-. Optimize database SQLs::
+Optimize database SQLs::
 * Efficient execution of SQLs.
 * Use hints.
 * Use placeholders for parameters so that SQLs can be precompiled.
@@ -63,16 +63,15 @@ Do this: `if (log.isDebugEnabled()) {....}`
 * Don't lock if it is read only operation.
 * Be cautious whenever run SQL using DISTINCT key word.
 * Understand the indexes created on the table. Avoid #full table# scan.
-*
 
-. Scale out via process model::
+Scale out via process model::
 
-. Multithreading::
+Multithreading::
 * Use the full power and capacity allowed
 * Avoid dead lock or race condition - Race conditions occurs when 2 or more threads operate on same object without proper synchronization and the steps on the operation interleaves on other thread.
 * Avoid starvation - When a thread is not granted CPU time because other threads were using it all, it is called starvation.
 
-. Fine tuning JVM parameters::
+Fine tuning JVM parameters::
 * Memory usage.
 * Garbage collection algorithms.
 
