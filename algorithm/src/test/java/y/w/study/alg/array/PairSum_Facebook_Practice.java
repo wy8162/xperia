@@ -170,6 +170,7 @@ public class PairSum_Facebook_Practice {
 
     // Add any helper functions you may need here
     private int penalty = 0;
+
     private void calc(int[] arr, int index) {
         if (index <= 0) {
             return;
@@ -209,5 +210,71 @@ public class PairSum_Facebook_Practice {
         calc(arr, arr.length - 1);
 
         return penalty;
+    }
+
+    @Test
+    public void test4() {
+        int[] res;
+
+        // Expect: {2, 4, 4, 5}
+        res = getMilestoneDays(new int[]{100, 200, 300, 400, 500}, new int[]{300, 800, 1000, 1400});
+
+        // [4, 6, 10]
+        res = getMilestoneDays(new int[]{10,20,30,40,50,60,70,80,90,100}, new int[]{100,200,500});
+
+        // {5, 4, 2, 3, 2}
+        res = getMilestoneDays(new int[]{700, 800, 600, 400, 600, 700}, new int[]{3100, 2200, 800, 2100, 1000});
+
+    }
+
+     class Pair implements Comparable<Pair> {
+        public final int milestone;
+        public final int index;
+
+        public Pair(int milestone, int index) {
+            this.milestone = milestone;
+            this.index = index;
+        }
+
+        @Override
+        public int compareTo(Pair o1) {
+            return this.milestone - o1.milestone;
+        }
+    }
+
+    int[] getMilestoneDays(int[] revenues, int[] milestones) {
+        // Write your code here
+        int[] res = new int[milestones.length];
+        Arrays.fill(res, -1);
+
+        Pair[] pairs = new Pair[milestones.length];
+        for (int i = 0; i < milestones.length; i++)
+            pairs[i] = new Pair(milestones[i], i);
+
+        Arrays.sort(pairs);
+
+        int total = 0;
+        for (int i = 0; i < revenues.length; i++) {
+            total += revenues[i];
+
+            int index = Arrays.binarySearch(pairs, new Pair(total, 0));
+
+            if (index >= 0) {
+                for (int j = index; j >= 0; j--) {
+                    int k = pairs[j].index;
+                    if (res[k] < 0 && total >= pairs[j].milestone) res[k] = i + 1;
+                }
+            } else if (index < -1 ){
+                index = -index - 1;
+
+                for (int j = index - 1; j >= 0; j--) {
+                    int k = pairs[j].index;
+                    if (res[k] < 0 && total >= pairs[j].milestone)
+                        res[k] = i + 1;
+                }
+            }
+        }
+
+        return res;
     }
 }
