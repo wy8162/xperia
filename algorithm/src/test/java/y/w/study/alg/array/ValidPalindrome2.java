@@ -4,6 +4,10 @@ import org.junit.Test;
 
 /**
  * Given a string s, return true if the s can be palindrome after deleting at most one character from it.
+ *      a1 a2 a3 a4 a5 ... an-1 an
+ *            |i           |j
+ *  if ai != aj: check if ai...aj-1 or ai+1...aj is palindrome. If yes, then deleting either ai or aj makes it a
+ *  valid palindrome.
  */
 public class ValidPalindrome2 {
     @Test
