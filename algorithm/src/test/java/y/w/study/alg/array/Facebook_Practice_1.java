@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import org.junit.Test;
 
-public class PairSum_Facebook_Practice {
+public class Facebook_Practice_1 {
 
     @Test
     public void test() {
