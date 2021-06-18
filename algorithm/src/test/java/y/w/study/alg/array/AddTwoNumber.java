@@ -48,28 +48,28 @@ public class AddTwoNumber {
         Iterator<Integer> it1 = ns1.iterator();
         Iterator<Integer> it2 = ns2.iterator();
 
-        boolean carryOver = false;
+        int carry = 0;
         while (it1.hasNext() && it2.hasNext()) {
-            Integer sum = it1.next() + it2.next() + (carryOver ? 1 : 0);
+            Integer sum = it1.next() + it2.next() + carry;
 
             Integer mod = sum % 10;
+            carry = sum / 10;
 
             nums.addLast(mod);
-            carryOver = sum > mod;
         }
 
         it1 = it1.hasNext() ? it1 : it2;
         while(it1.hasNext()) {
-            Integer sum = it1.next() + (carryOver ? 1 : 0);
+            Integer sum = it1.next() + carry;
 
             Integer mod = sum % 10;
+            carry = sum / 10;
 
             nums.addLast(mod);
-            carryOver = sum > mod;
         }
 
-        if (carryOver)
-            nums.addLast(1);
+        if (carry > 0)
+            nums.addLast(carry);
 
         return nums;
     }

@@ -30,26 +30,25 @@ public class AddBinary {
     public String addBinary(String a, String b) {
         if (a == null || b == null) return "";
 
+        // Assume a.length >= b.length. Otherwise calls addBinary exchange them.
+        if (a.length() < b.length())
+            return addBinaryLeetCode(b, a);
+
         StringBuilder sb = new StringBuilder();
 
-        String l = a, s = b;
-        if (a.length() < b.length()) {
-            l = b;
-            s = a;
-        }
-
+        // Handling carry bit is important.
         int carry = 0;
-        for (int i = 0; i < s.length(); i++) { // Time: m
-            int lc = l.charAt(l.length() - 1 - i) - '0';
-            int ls = s.charAt(s.length() - 1 - i) - '0';
+        for (int i = 0; i < b.length(); i++) { // Time: m
+            int lc = a.charAt(a.length() - 1 - i) - '0';
+            int ls = b.charAt(b.length() - 1 - i) - '0';
             int result = lc + ls + carry;
             carry = result / 2;
 
             sb.append(result % 2);
         }
 
-        for (int i = s.length(); i < l.length() ; i++) { // Time: n - m
-            int lc = l.charAt(l.length() - 1 - i) - '0';
+        for (int i = b.length(); i < a.length() ; i++) { // Time: n - m
+            int lc = a.charAt(a.length() - 1 - i) - '0';
             int result = lc + carry;
 
             carry = result / 2;
