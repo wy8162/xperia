@@ -1,9 +1,8 @@
 package y.w.j8.j8tests;
 
-import y.w.cvs.CsvLineParser;
-import y.w.cvs.GenericObjectMapper;
+import y.w.csv.CsvLineParser;
+import y.w.csv.GenericObjectMapper;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 //import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.test.context.junit4.SpringRunner;
 

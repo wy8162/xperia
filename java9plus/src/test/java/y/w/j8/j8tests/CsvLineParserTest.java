@@ -1,7 +1,7 @@
 package y.w.j8.j8tests;
 
 import org.junit.Test;
-import y.w.cvs.CsvLineParser;
+import y.w.csv.CsvLineParser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

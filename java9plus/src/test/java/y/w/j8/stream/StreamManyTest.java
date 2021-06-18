@@ -1,8 +1,8 @@
 package y.w.j8.stream;
 
 import y.w.j8.j8tests.SalesTransaction;
-import y.w.cvs.CsvLineParser;
-import y.w.cvs.GenericObjectMapper;
+import y.w.csv.CsvLineParser;
+import y.w.csv.GenericObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;
