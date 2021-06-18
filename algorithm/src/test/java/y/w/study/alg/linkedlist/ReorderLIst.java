@@ -15,8 +15,16 @@ public class ReorderLIst {
 
         // find the middle of linked list [Problem 876]
         // in 1->2->3->4->5->6 find 4
-        // NOTE: this way using slow and fast to find the middle is
-        // very good.
+        // NOTE: this way using slow and fast to find the middle is very good.
+        // a1 a2 a3 a4 a5
+        //        |-slow - n / 2 + 1
+        //               |-fast
+        //
+        // a1 a2 a3 a4 a5 a6
+        //           |-slow - n/2 + 1
+        //                 |-fast
+        //
+        // slow will end up with n/2 + 1
         ListNode slow = head, fast = head;
         while (fast != null && fast.next != null) {
             slow = slow.next;

@@ -29,7 +29,7 @@ public class MergeSortedList {
 
     }
 
-    public ListNode mergeTwoListsIterative(ListNode l1, ListNode l2) {
+    public ListNode merge1(ListNode l1, ListNode l2) {
         if (l1 == null) return l2;
         if (l2 == null) return l1;
 
@@ -52,5 +52,36 @@ public class MergeSortedList {
         p.next = t1 == null ? t2 : t1;
 
         return header.next;
+    }
+
+    public ListNode merge2(ListNode l1, ListNode l2) {
+        if (l1 == null) return l1;
+        if (l2 == null) return l2;
+
+        ListNode h;
+        if (l1.val < l2.val) {
+            h = l1;
+            l1 = l1.next;
+        } else {
+            h = l2;
+            l2 = l2.next;
+        }
+
+        ListNode t = h;
+
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                t.next = l1;
+                l1 = l1.next;
+            } else {
+                t.next = l2;
+                l2 = l2.next;
+            }
+            t = t.next;
+        }
+
+        t.next = l1 != null ? l1 : l2;
+
+        return h;
     }
 }
