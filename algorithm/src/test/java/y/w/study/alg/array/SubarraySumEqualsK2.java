@@ -11,12 +11,6 @@ import org.junit.Test;
 public class SubarraySumEqualsK2 {
     @Test
     public void test() {
-//        assertEquals(3, subarraySumLeetcode2(new int[]{1,-1,0}, 0));
-//        assertEquals(1, subarraySumLeetcode2(new int[]{1}, 1));
-//        assertEquals(4, subarraySumLeetcode2(new int[]{1,2,1,2,1}, 3));
-//        assertEquals(2, subarraySumLeetcode2(new int[]{1,1,1}, 2));
-//        assertEquals(2, subarraySumLeetcode2(new int[]{1,2,3}, 3));
-
         assertEquals(3, subarraySumUsingCumulativeSum(new int[]{1,-1,0}, 0));
         assertEquals(1, subarraySumUsingCumulativeSum(new int[]{1}, 1));
         assertEquals(4, subarraySumUsingCumulativeSum(new int[]{1,2,1,2,1}, 3));

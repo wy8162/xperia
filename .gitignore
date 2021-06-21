@@ -32,3 +32,5 @@ build/
 /restful/.mvn/wrapper/maven-wrapper.jar
 /restful/.mvn/wrapper/maven-wrapper.properties
 /restful/.mvn/wrapper/MavenWrapperDownloader.java
+*.class
+*.swp
