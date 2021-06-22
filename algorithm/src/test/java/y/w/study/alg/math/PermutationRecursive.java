@@ -2,6 +2,7 @@ package y.w.study.alg.math;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -49,6 +50,13 @@ public class PermutationRecursive {
         return result;
     }
 
+    /**
+     * Another way to generate permutations.
+     *
+     * @param nums
+     * @param start
+     * @param result
+     */
     private void generatePermutation(int[] nums, int start, List<List<Integer>> result) {
         if (start == nums.length - 1) {
             result.add(Arrays.stream(nums).boxed().collect(Collectors.toList()));
@@ -59,6 +67,26 @@ public class PermutationRecursive {
             swap(nums, i, start);
             generatePermutation(nums, start + 1, result);
             swap(nums, i, start);
+        }
+    }
+
+    /**
+     * Works when there are any number of elements.
+     * Recursively generate permutations.
+     */
+    public void selectPermutations(String[] arr, boolean[] selections, Deque<String> permutation, List<String> res) {
+        if (permutation.size() == arr.length) {
+            res.add(String.join(",", permutation));
+            return;
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            if (selections[i]) continue; // used already
+            selections[i] = true;
+            permutation.addLast(arr[i]);
+            selectPermutations(arr, selections, permutation, res);
+            selections[i] = false;
+            permutation.removeLast(); // Pop out the element arr[i]
         }
     }
 

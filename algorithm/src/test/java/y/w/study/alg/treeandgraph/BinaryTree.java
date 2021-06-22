@@ -32,7 +32,7 @@ public class BinaryTree {
         System.out.println(node.val);
     }
 
-    // BFS - Level Order Traversal
+    // BFS or Level Order Traversal
     public void levelOrderTravesal(TreeNode node) {
         Queue<TreeNode> Q = new LinkedList<>();
 

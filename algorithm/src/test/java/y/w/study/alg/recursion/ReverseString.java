@@ -1,6 +1,6 @@
-package x.y.stud.alg.recursion;
+package y.w.study.alg.recursion;
 
-public class RevereString {
+public class ReverseString {
     public static String reverseString(String s) {
         if (s == null || s.length() <= 1) return s;
 
