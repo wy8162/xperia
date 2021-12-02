@@ -14,7 +14,7 @@ import y.w.study.alg.graph.TreeNode;
 public class TreeSerializer {
 
     // Encodes a tree to a single string.
-    public String serialize(TreeNode root) {
+    public static String serialize(TreeNode root) {
         ArrayList<String> list = new ArrayList<>();
         LinkedList<TreeNode> q = new LinkedList<>();
         q.offer(root);
@@ -34,7 +34,7 @@ public class TreeSerializer {
     }
 
     // Decodes your encoded data to tree.
-    public TreeNode deserialize(String data) {
+    public static TreeNode deserialize(String data) {
         String[] arr = data.split(",");
         if (arr[0].equals("#")) {
             return null;

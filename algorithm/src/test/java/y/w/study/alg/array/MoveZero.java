@@ -25,6 +25,31 @@ public class MoveZero {
     }
 
     public void moveZeros(int[] nums) {
+        if (nums == null || nums.length <= 1) return;
+
+        int i = 0, j = 0;
+        while (i <= nums.length - 1 && j <= nums.length - 1) {
+            if (nums[j] != 0) {
+                j++;
+                i = Math.max(i, j);
+
+                continue;
+            }
+
+            if (nums[i] != 0) {
+                // Swap
+                int temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
+
+                i++; j++;
+            } else {
+                i++;
+            }
+        }
+    }
+
+    public void moveZeros2(int[] nums) {
         if (nums == null || nums.length <=1 ) return;
 
         int i = 0, j, len = nums.length;

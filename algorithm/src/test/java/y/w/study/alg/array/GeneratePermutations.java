@@ -1,4 +1,4 @@
-package y.w.stud.alg.array;
+package y.w.study.alg.array;
 
 import java.util.*;
 import java.util.stream.*;
