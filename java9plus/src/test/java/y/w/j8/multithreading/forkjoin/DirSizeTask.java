@@ -68,7 +68,7 @@ public class DirSizeTask {
             counter.putIfAbsent(Thread.currentThread().getName(), 0);
             counter.put(Thread.currentThread().getName(), counter.get(Thread.currentThread().getName()) + 1);
             if (file.isFile()) {
-//                System.out.println(String.format("--> Thread = %s .. %s", Thread.currentThread().getName(), file.getAbsolutePath()));
+                System.out.println(String.format("--> DOING = %s .. %s", Thread.currentThread().getName(), file.getAbsolutePath()));
                 return file.length();
             } else {
                 final List<SizeOfFileTask> tasks = new ArrayList<>();
@@ -82,7 +82,9 @@ public class DirSizeTask {
                 }
                 long size = 0;
                 for (final SizeOfFileTask task : tasks) {
+                    System.out.println(String.format("--> JOIN = %s .. %s", Thread.currentThread().getName(), file.getAbsolutePath()));
                     size += task.join();
+                    System.out.println(String.format("--> DONE = %s .. %s", Thread.currentThread().getName(), file.getAbsolutePath()));
                 }
 
                 return size;

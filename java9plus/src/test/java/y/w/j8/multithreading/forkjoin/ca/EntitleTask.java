@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import y.w.j8.multithreading.forkjoin.ca.model.CustomerAccount;
 
-public class EntileTask extends AbstractCustomerAccountsTask<List<CustomerAccount>> {
+public class EntitleTask extends AbstractCustomerAccountsTask<List<CustomerAccount>> {
     private static Map<String, List<CustomerAccount>> serviceableAccounts = new HashMap<>();
     private final String customerId;
 
@@ -18,7 +18,7 @@ public class EntileTask extends AbstractCustomerAccountsTask<List<CustomerAccoun
         serviceableAccounts.put("5", Arrays.asList(new CustomerAccount()));
     }
 
-    public EntileTask(String customerId) {
+    public EntitleTask(String customerId) {
         this.customerId = customerId;
     }
 

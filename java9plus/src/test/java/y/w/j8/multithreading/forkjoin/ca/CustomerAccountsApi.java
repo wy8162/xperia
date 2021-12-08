@@ -20,12 +20,12 @@ public class CustomerAccountsApi extends AbstractCustomerAccountsTask<AccountDet
 
     @Override
     protected AccountDetails compute() {
-        EntileTask entileTask = new EntileTask(customerId);
+        EntitleTask entileTask = new EntitleTask(customerId);
         TCRTask tcrTask = new TCRTask(customerId);
 
         entileTask.fork();
         tcrTask.fork();
 
-
+        return null;
     }
 }

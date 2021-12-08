@@ -1,5 +1,6 @@
 package y.w.j8.multithreading.executor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,21 +25,36 @@ public class TestExecutorService {
         };
 
         Callable<String> callable = () -> {
-            TimeUnit.MILLISECONDS.sleep(300);
+            TimeUnit.MILLISECONDS.sleep(1000);
+
+            System.out.println("Done - " + Thread.currentThread().getName());
 
             return "Task finished";
         };
 
-        List<Callable<String>> callables = Arrays.asList(callable, callable, callable);
+        List<Callable<String>> callables = new ArrayList<>();
+        for (int i = 0; i < 20; i++) callables.add(callable);
 
-        executor.execute(task);
-        Future<String> result = executor.submit(callable);
-        System.out.println(result.get());
+        //executor.execute(task);
+        //Future<String> result = executor.submit(callable);
+        //System.out.println(result.get());
 
-        String s = executor.invokeAny(callables);
-        System.out.println(s);
+        // String s = executor.invokeAny(callables);
+        // System.out.println(s);
 
         List<Future<String>> ss = executor.invokeAll(callables);
+
+        System.out.println("This thread: " + Thread.currentThread().getName());
+
+        for (Future<String> r : ss) {
+            if (r.isDone()) {
+                System.out.println("Task done: " + r.get());
+            } else {
+                System.out.println("Task not done yet, waiting... " + r.get());
+            }
+        }
+
+        executor.shutdown();
     }
 
 }
