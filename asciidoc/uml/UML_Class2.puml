@@ -1,0 +1,80 @@
+@startuml
+package y.w.car {
+  interface Car {
+    +start() : void
+    +drive() : void
+    -getVIN() : String
+  }
+
+  class Truck implements Car {
+    -maker : String
+  }
+
+  class SUV implements Car
+  class Crossover implements Car
+
+  Car "1" o-- "4" Tire
+  Car "1" o-- "1" Engine
+}
+
+package y.w.car.model {
+  class Tire {
+    - serieNumber : String
+    - size : Integer
+  }
+
+  class Engine {
+    - VIN : String
+  }
+}
+
+
+package com.acme.products.model.provider {
+    interface Provider {
+        Enumeration ProviderType
+        + name() : String
+        + description()
+        + type() : ProviderType
+        + rating() : Int
+    }
+
+    class HotelProvider implements Provider
+    class CruiseProvider implements Provider
+    class AirlineProvider implements Provider
+}
+
+package com.acme.products.model {
+   class Product {
+    + publicId : String
+    + description : String
+    + providers : Provider[]
+   }
+
+   Product "1" o-- "*" Provider
+}
+
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+Object[] elementData
+size()
+}
+
+enum TimeUnit {
+DAYS
+HOURS
+MINUTES
+}
+
+@enduml

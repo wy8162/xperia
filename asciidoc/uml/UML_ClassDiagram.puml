@@ -1,0 +1,18 @@
+@startuml
+abstract class Car {
+  -Tire tires
+  -Engine engine
+  +start()
+  +drive()
+}
+
+class Truck
+class Engine
+class Tire
+
+Truck --|> Car
+Truck "1" o-- "4" Tire : contains
+Truck "1" o-- "1" Engine : contains
+Truck *-- Color
+
+@enduml

@@ -46,7 +46,7 @@ public class AddTwoNumbers {
     }
 
     private ListNode appendNode(ListNode tail, int value) {
-        ListNode node = new ListNode(value, null);
+        ListNode node = new ListNode(value);
         tail.next = node;
         node.next = null;
         return node;

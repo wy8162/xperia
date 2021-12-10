@@ -1,0 +1,33 @@
+@startuml
+header Use Case
+title Use Case
+left to right direction
+
+actor client
+package Supermarket {
+usecase "Buy Fruit" as UC1
+usecase "Checkout"  as UC2
+}
+
+client --> UC1
+client --> UC2
+
+package Parking {
+  usecase "Open Car Door" as UC3
+  usecase "Start Car"     as UC4
+}
+
+note "Walking to parking lot" as N1
+
+client .. N1
+N1 .. UC3
+
+client --> UC4
+
+client --> (Leaving Home)
+
+:Registar: --> UC2
+note left of client : this is a client
+
+@enduml
+

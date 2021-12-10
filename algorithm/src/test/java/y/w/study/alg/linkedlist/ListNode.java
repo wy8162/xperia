@@ -2,8 +2,8 @@ package y.w.study.alg.linkedlist;
 
 public class ListNode {
      int val;
-     ListNode next;
-     ListNode random;
+     ListNode next = null;
+     ListNode random = null;
      ListNode() {}
      ListNode(int val) { this.val = val; }
 
