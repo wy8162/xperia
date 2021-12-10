@@ -6,29 +6,29 @@ import org.junit.Test;
 
 public class Heapsort {
     private static void sort(int[] arr) {
-        for (int i = arr.length / 2 - 1; i >= 0; i--) // A[n/2..n] are leaves.
+        // nodes >= arr.length / 2 are all leaves
+        for (int i = arr.length / 2 -1; i >= 0; i--)
             maxHeapify(arr, arr.length, i);
 
+        // arr[0] is always the largest.
         for (int i = arr.length - 1; i >= 0; i--) {
+            // Move the largest to the back
             swap(arr, 0, i);
+
+            // re-heapify it based on new size
             maxHeapify(arr, i, 0);
         }
     }
 
     private static void maxHeapify(int[] arr, int size, int i) {
-        int l = 2 * i + 1; // Left node - i starts from 0
-        int r = 2 * i + 2; // Right node
-
-        // Finding the largest of arr[i], arr[l], arr[r]
+        int l = i * 2 + 1;
+        int r = l + 1;
         int largest = i;
-        if (l < size && arr[l] > arr[i])
-            largest = l;
 
-        if (r < size && arr[r] > arr[largest])
-            largest = r;
-
+        if (l < size && arr[l] > arr[largest]) largest = l;
+        if (r < size && arr[r] > arr[largest]) largest = r;
         if (largest != i) {
-            swap(arr, i, largest);
+            swap(arr, largest, i);
             maxHeapify(arr, size, largest);
         }
     }
