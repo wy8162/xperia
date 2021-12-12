@@ -1,0 +1,40 @@
+@startuml
+package y.w.customer {
+  class Customer <<entity>> {
+    - name: String
+    - ssn: String
+    - account : Account
+    - address : Address
+    +getName()
+  }
+  note right of Customer:"Customer details"
+  note right of Customer::"name"
+  This is customer name
+  end note
+}
+
+
+package y.w.account {
+  class Account <<entity>> {
+    - accountNumber: String
+    - status : String
+    - balance : Double
+    + getStatus()
+    + deposit()
+    + withdraw()
+  }
+}
+
+package y.w.model {
+  class Address <<Value Object>>  {
+    - street : String
+    - city : String
+    - state : String
+    - zip : String
+  }
+}
+
+Customer "1" *-- "*" Account
+Customer "1" *-- "1" Address
+
+@enduml

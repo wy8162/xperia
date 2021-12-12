@@ -1,0 +1,148 @@
+@startuml
+header Use Case
+title Use Case
+left to right direction
+
+actor client
+package BookingService {
+usecase "Browse Tickets" as UC1
+usecase "Add Tickets to Cart"  as UC2
+usecase "Submit Booking Request"  as UC3
+usecase "Submit Payment Method"  as UC4
+usecase "Payment Confirmation"  as UC5
+usecase "Reservation Confirmation"  as UC6
+usecase "Notification"  as UC7
+}
+
+client --> UC1
+UC1 --> UC2
+UC2 --> UC3
+UC3 --> UC4
+UC4 --> UC5
+UC5 --> UC6
+UC6 --> UC7
+
+@enduml
+@startuml
+title BookingConfirmation Class Diagram
+package m.l.model.booking {
+  class BookingConfirmation <<Aggregate Root>> {
+    - long : referenceId
+    - List<Reservation> : reservations
+    - long : referenceProposal
+    - PaymentConfirmation: paymentConfirmation
+    - BookingConfirmationState : status
+  }
+
+  class Reservation <<Value Object>> {
+  }
+
+  enum BookingConfirmationState {
+    PENDING_PAYMENT
+    PENDING_RESERVATION
+    RESERVATION_IN_PROGRESS
+    RESERVATION_CONFIRMED
+    CANCELLATION_IN_PROGRESS
+    CANCELLED
+  }
+}
+
+package m.l.model.payment {
+  class PaymentConfirmation {
+  }
+  note bottom of PaymentConfirmation : The confirmation of payment.
+}
+
+BookingConfirmation "1" *-- "*" Reservation
+BookingConfirmation -- BookingConfirmationState : defines
+BookingConfirmation "1" *-- "1" PaymentConfirmation
+@enduml
+
+@startuml
+header BookingConfirmation State Machine
+title BookingConfirmation State Diagram
+[*] --> PENDING_PAYMENT : BookingConfirmation instance created
+PENDING_PAYMENT : Customer has committed to the referenceProposal
+PENDING_PAYMENT : but the payment has not been paid yet.
+
+state Reservation {
+  PENDING_RESERVATION -> RESERVATION_IN_PROGRESS
+  PENDING_RESERVATION : customer has paid. Reservation has not started.
+
+  RESERVATION_IN_PROGRESS -> RESERVATION_CONFIRMED
+  RESERVATION_IN_PROGRESS : reservation has been started
+  RESERVATION_CONFIRMED : all reservations have been confirmed
+}
+
+state Cancellation {
+  CANCELLATION_IN_PROGRESS -> CANCELLED
+}
+
+PENDING_PAYMENT --> Reservation
+PENDING_PAYMENT --> Cancellation
+RESERVATION_CONFIRMED --> Cancellation
+
+CANCELLED --> [*]
+RESERVATION_CONFIRMED --> [*]
+
+@enduml
+@startuml
+Customer -->Agent : request
+activate Customer
+Agent --> SalesSystem : check availability
+Agent <-- SalesSystem : response
+Customer <-- Agent : confirm
+deactivate Customer
+@enduml
+@startuml
+interface PaymentConfirmation <<repository>> {
+  + PaymentConfirmation getPaymentConfirmationById()
+}
+@enduml
+@startuml
+(*) --> "check proposal"
+
+If "Missing any information" then
+--> [Yes] "Return errors"
+--> (*)
+
+else
+--> Calulate per person price
+--> Check hotel price
+--> Check flights
+
+If "sfs" then
+--> Done
+--> (*)
+else
+--> continue
+--> (*)
+@enduml
+@startuml
+package "Booking Service" as BookingService {
+  [BookingConfirmation] --> [Reservation]
+  [BookingConfirmation] --> [PaymentConfirmation]
+  [BookingConfirmation] --> [Notification]
+}
+Client - [API Gateway]
+[API Gateway] ..> [Load Balancer] : use
+[Load Balancer] ..> BookingService : mutual SSL & Auth2
+BookingService --> [ECS / EC2] : use
+[ECS / EC2] --> [Tasks] : use
+BookingService --> [ASG] : use
+BookingService --> [Cloudwatch] : use
+BookingService --> [S3] : environment related configuration
+[S3] --> [IAM Role]
+BookingService --> [Chamber of Secret]
+BookingService --> [Chamber of Secret] : secrets
+BookingService --> [MySQL] : payments
+BookingService --> [Security / Directory Service] : authorization / authentication
+BookingService --> [DynamoDB] : booking details
+BookingService --> [Kafka] : topics
+[Kafka] --> [Splunk Agent] : logs
+[Kafka] --> [Audit] : logs
+[Kafka] --> [Newrelic] : logs
+
+
+@enduml
+

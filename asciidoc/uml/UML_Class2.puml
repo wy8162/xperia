@@ -13,17 +13,17 @@ package y.w.car {
   class SUV implements Car
   class Crossover implements Car
 
-  Car "1" o-- "4" Tire
-  Car "1" o-- "1" Engine
+  Truck "1" o-- "4" Tire
+  Truck "1" o-- "1" Engine
 }
 
 package y.w.car.model {
-  class Tire {
+  class Tire <<entity>> {
     - serieNumber : String
     - size : Integer
   }
 
-  class Engine {
+  class Engine <<entity>> {
     - VIN : String
   }
 }

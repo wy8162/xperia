@@ -1,5 +1,6 @@
 package y.w.j8.j8.future;
 
+import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -62,7 +63,7 @@ public class CompletableFutureAsync2Test
     }
 
     @Test
-    public void testCompletableAsync() throws InterruptedException, ExecutionException, TimeoutException
+    public void testCompletableAsyncWithExecutor() throws InterruptedException, ExecutionException, TimeoutException
     {
         ExecutorService executor = getExecutor();
 
@@ -81,22 +82,103 @@ public class CompletableFutureAsync2Test
                 .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote), executor)))
                 .collect(toList());
 
+        List<CompletableFuture<String>> priceFutures2 = shops
+            .stream()
+            .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(prod), executor)) // Use our executor for much better performance
+            // parse is local computation. So do it sequentially
+            .map(future -> future.thenApply(Quote::parse))
+            // thenCompose allows you to pipeline two asynchronous operations, passing the result of the first
+            // operation to the second operation when it becomes available
+            .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote), executor)))
+            .collect(toList());
+
+        log.info("Now...waiting for the results");
         // join method waits and returns the result, not a future.
         // Second stream should not be chained to the first one. Otherwise, the whole
         // thing will become sequential because of stream's laziness.
         prices = priceFutures.stream().map(CompletableFuture::join).collect(toList());
+        prices.addAll(priceFutures2.stream().map(CompletableFuture::join).collect(toList()));
+
+        prices.stream().forEach(System.out::println);
 
         log.info("Prices found for " + prod + " are:\n" + StringUtils.join(prices, "\n"));
         log.info("===> Total time spent - CompletableFuture.supplyAsync: " + (System.nanoTime() - startTime)/1_000_000);
 
-//        executor.shutdownNow();
-//
-//        if (!executor.awaitTermination(100, TimeUnit.MICROSECONDS)) {
-//            System.out.println("Still waiting...");
-//            System.exit(0);
-//        }
-//        System.out.println("Exiting normally...");
+        executor.shutdownNow();
+
+        if (!executor.awaitTermination(100, TimeUnit.MICROSECONDS)) {
+            System.out.println("Still waiting...");
+            System.exit(0);
+        }
+        System.out.println("Exiting normally...");
     }
+
+
+    @Test
+    public void testCompletableAsyncUsingDefaultCommonPool() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        ExecutorService executor = getExecutor();
+
+        long startTime = System.nanoTime();
+
+        String prod = prodName + "1";
+
+        List<CompletableFuture<String>> priceFutures = shops
+            .stream()
+            .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(prod))) // Use our executor for much better performance
+            .map(future -> future.thenApply(Quote::parse))
+            .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote))))
+            .collect(toList());
+
+        List<CompletableFuture<String>> priceFutures2 = shops
+            .stream()
+            .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(prod))) // Use our executor for much better performance
+            .map(future -> future.thenApply(Quote::parse))
+            .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote))))
+            .collect(toList());
+
+        log.info("Now...waiting for the results");
+        prices = priceFutures.stream().map(CompletableFuture::join).collect(toList());
+        prices.addAll(priceFutures2.stream().map(CompletableFuture::join).collect(toList()));
+
+        log.info("Prices found for " + prod + " are:\n" + StringUtils.join(prices, "\n"));
+        log.info("===> Total time spent - CompletableFuture.supplyAsync: " + (System.nanoTime() - startTime)/1_000_000);
+
+        prices.stream().forEach(System.out::println);
+    }
+
+    /**
+     * Not working yet...need to study it more.
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     */
+    @Test
+    public void testCompletableAsyncUsingBlockingTasks() throws InterruptedException, ExecutionException, TimeoutException
+    {
+        long startTime = System.nanoTime();
+
+        String prod = prodName + "1";
+
+        List<String> price = shops
+            .stream()
+            .map(shop -> BlockingTasks.<String>callInManagedBlock(() -> shop.getPrice(prod)))
+            .map(quote ->BlockingTasks.<String>callInManagedBlock(() -> Discount.applyDiscount(quote)))
+            .collect(toList());
+
+        List<String> price1 = shops
+            .stream()
+            .map(shop -> BlockingTasks.<String>callInManagedBlock(() -> shop.getPrice(prod)))
+            .map(quote ->BlockingTasks.<String>callInManagedBlock(() -> Discount.applyDiscount(quote)))
+            .collect(toList());
+
+        log.info("Now...waiting for the results");
+        log.info("Prices found for " + prod + " are:\n" + StringUtils.join(prices, "\n"));
+        log.info("===> Total time spent - CompletableFuture.supplyAsync: " + (System.nanoTime() - startTime)/1_000_000);
+        prices.addAll(price1);
+        prices.stream().forEach(System.out::println);
+    }
+
 
     static class Product
     {
@@ -163,7 +245,7 @@ public class CompletableFutureAsync2Test
          */
         public String getPrice(String productName)
         {
-            log.info(storeName + "----> Inside future task...begin, to wait for random time");
+            log.info(storeName + "----> Inside future task...begin, to wait for random time: " + Thread.currentThread().getName());
 
             Product prod = products.get(productName);
 
@@ -277,6 +359,12 @@ public class CompletableFutureAsync2Test
             return String.format("%s price is %.2f", quote.getStoreName(), Discount.apply(quote.getPrice(), quote.getDiscountCode()));
         }
 
+        public static String applyDiscount(String price)
+        {
+            Quote quote = Quote.parse(price);
+            return String.format("%s price is %.2f", quote.getStoreName(), Discount.apply(quote.getPrice(), quote.getDiscountCode()));
+        }
+
         private static BigDecimal apply(BigDecimal price, Code code)
         {
             delayRandomly();
@@ -308,7 +396,7 @@ public class CompletableFutureAsync2Test
         try
         {
             long time = new RandomDataGenerator().nextLong(500L, 5000L);
-            Thread.sleep(time);
+            Thread.sleep(500);
         }
         catch (InterruptedException e)
         {
