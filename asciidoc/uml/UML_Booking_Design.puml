@@ -120,25 +120,38 @@ else
 @enduml
 @startuml
 package "Booking Service" as BookingService {
-  [BookingConfirmation] --> [Reservation]
-  [BookingConfirmation] --> [PaymentConfirmation]
-  [BookingConfirmation] --> [Notification]
+  package "ExternalServices" {
+    [ProviderReservationService] as ReservationService
+    [PaymentGatewayService] as PaymentService
+  }
+  package "Booking Application" as BKAPP {
+    HTTPS ..> [BookingAppService] : accepts RESTful requests
+    [BookingAppService] ..> [BookingDomainService]
+    [BookingDomainService] ..> [BookingConfirmation]
+    [BookingConfirmation] ..> [PaymentConfirmation]
+    [PaymentConfirmation] ..> [ReservationConfirmation]
+    [BookingAppService] ..> [NotificationServices]
+    [BookingAppService] ..> [LoggingServices]
+    [BookingAppService] ..> [AuditingServices]
+    [PaymentConfirmation] ..> PaymentService
+    [ReservationConfirmation] ..> ReservationService
+  }
+  [ECS] ..> [ASG] : use
+  [ASG] ..> [Tasks / Docker Containers] : scale-in | sale-out
+  [Tasks / Docker Containers] ..> BKAPP : runs
 }
 Client - [API Gateway]
 [API Gateway] ..> [Load Balancer] : use
 [Load Balancer] ..> BookingService : mutual SSL & Auth2
-BookingService --> [ECS / EC2] : use
-[ECS / EC2] --> [Tasks] : use
-BookingService --> [ASG] : use
-BookingService --> [Cloudwatch] : use
-BookingService --> [S3] : environment related configuration
+BKAPP --> [Cloudwatch] : use
+BKAPP --> [S3] : environment related configuration
 [S3] --> [IAM Role]
-BookingService --> [Chamber of Secret]
-BookingService --> [Chamber of Secret] : secrets
-BookingService --> [MySQL] : payments
-BookingService --> [Security / Directory Service] : authorization / authentication
-BookingService --> [DynamoDB] : booking details
-BookingService --> [Kafka] : topics
+BKAPP --> [Chamber of Secret]
+BKAPP --> [Chamber of Secret] : secrets
+BKAPP --> [MySQL] : payments
+BKAPP --> [Security / Directory Service] : authorization / authentication
+BKAPP --> [DynamoDB] : booking details
+BKAPP --> [Kafka] : topics
 [Kafka] --> [Splunk Agent] : logs
 [Kafka] --> [Audit] : logs
 [Kafka] --> [Newrelic] : logs

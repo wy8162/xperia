@@ -1,0 +1,20 @@
+@startuml
+start
+:Serviceable Accounts;
+if (Serviceabl Accounts from Entitlements is Empty?) then (yes)
+  :use all accounts from TCR;
+else (no)
+  :keep serviceable accounts;
+endif
+:call CRRA;
+:group serviceable accounts;
+switch (CRRA response)
+case (Retail Accounts)
+  :map retail accounts;
+case (SDB accounts)
+  :map **SDB accounts**;
+case (Loan Accounts)
+  :map Loan Accounts;
+endswitch
+
+@enduml

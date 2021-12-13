@@ -1,0 +1,46 @@
+@startuml
+!include <C4/C4_Container>
+!include <C4/C4_Context>
+!include <C4/C4_Component>
+!include <C4/C4_Dynamic>
+!include <C4/C4_Deployment>
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include DEVICONS/mysql.puml
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+title Customers Accounts System Context Diagram
+
+Person(externalClients, "Clients", "Consumes Customers Accounts API to get snapshot of accounts")
+Person(internalClients, "Clients", "Consumes Customers Accounts API to get snapshot of accounts")
+
+Enterprise_Boundary(bs, "Banking System") {
+  System(ca, "Customers Accounts API", "Aggregates customers accounts")
+  System_Ext(cca, "Credit Card", "Credit Card API")
+  System_Ext(autoLoan, "Auto Loan", "Auto Loans")
+  System_Ext(entitlements, "Entitlements & Permission", "Permissions and redactions")
+  System_Ext(tcr, "Customers Relationships", "Customer relationships")
+  System_Ext(directAccount, "360 Accounts", "Direct Accounts")
+  System_Ext(retailAccount, "Retail Accounts")
+  System_Ext(s3, "AWS S3", "Environment related configurations")
+  System_Ext(cos, "Chamber of Secret", "Stores secrets for applications")
+}
+
+Rel(externalClients, ca, "http://api.abc.com/customersaccounts")
+Rel(internalClients, ca, "http://api.abc.com/customersaccounts")
+
+Rel(ca, cca, "REST API", "Retrieve Credit Card Accounts")
+Rel(ca, autoLoan, "REST API", "Retrieve auto loan accounts")
+Rel(ca, entitlements, "REST API", "Retrieve serviceable accounts")
+Rel(ca, tcr, "REST API", "Retrieve all accounts for a client")
+Rel(ca, directAccount, "REST API", "Retrieve checking accounts, saving accounts")
+Rel(ca, retailAccount, "REST API", "Retrieve retail accounts")
+Rel(ca, cos, "REST API", "Retrieve secrets and bearer tokens")
+Rel(ca, s3, "AWS S3 SDK", "Retrieve environment related configurations")
+
+
+
+@enduml
+@enduml
