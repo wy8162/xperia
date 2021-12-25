@@ -43,4 +43,3 @@ Rel(ca, s3, "AWS S3 SDK", "Retrieve environment related configurations")
 
 
 @enduml
-@enduml

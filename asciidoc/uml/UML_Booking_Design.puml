@@ -87,6 +87,26 @@ RESERVATION_CONFIRMED --> [*]
 
 @enduml
 @startuml
+title Booking State Changes
+start
+:**PENDING_PAYMENT**
+Customers have committed to proposal;
+partition "Reservation" {
+:**PENDING_RESERVATION** customers have paid;
+:**RESERVATION_IN_PROGRESS**;
+:**RESERVATION_CONFIRMED**;
+}
+if ("CANCELLATION REQUESTED") then (yes)
+partition "Cancellation" {
+:**CANCELLATION_IN_PROGRESS**;
+:**CANCELLED**;
+}
+else (no)
+endif
+stop
+
+@enduml
+@startuml
 Customer -->Agent : request
 activate Customer
 Agent --> SalesSystem : check availability

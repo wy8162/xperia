@@ -1,0 +1,10 @@
+@startuml
+start
+:serviceable accounts;
+if ("No Serviceable Accounts?") then (yes)
+:Use all accounts from TCR;
+else (no)
+:Use serviceable accounts;
+endif
+
+@enduml

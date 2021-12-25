@@ -75,6 +75,18 @@ public class BacktrackNQueen {
         for (int j = 0; j < Q.length; j++) {
             boolean legal = true;
             for (int i = 0; i <= r - 1; i++) {
+                /**         j=2
+                 *      1   2   3   4
+                 *    1 2y  3   4x  5 i=1,
+                 *    2 3  (4)  5   6 r=2
+                 *    3 4   5   6   7
+                 *    4 5   6   7   8
+                 *
+                 *    j + r = i + x where (i, x) is the cell on the upper right diagonal
+                 *    ==> x = j + r - i
+                 *    j + r - 2(r - i) = i + x where (i, x) is the cell on the upper left diagonal
+                 *    ==> x = j - r + i
+                 */
                 if (Q[i] == j || Q[i] == j + r - i || Q[i] == j - r + i)
                     legal = false;
             }

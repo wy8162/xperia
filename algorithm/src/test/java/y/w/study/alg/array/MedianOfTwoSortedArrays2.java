@@ -1,4 +1,4 @@
-package y.w.leetcode;
+package y.w.study.alg.array;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ import static junit.framework.TestCase.assertEquals;
  *
  * The median is (2 + 3)/2 = 2.5
  */
-public class MedianOfTwoSortedArrays
+public class MedianOfTwoSortedArrays2
 {
     /**
      * Returns an array of integers of all the elements of two arrays.

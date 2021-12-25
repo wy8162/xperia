@@ -1,4 +1,4 @@
-package y.w.leetcode;
+package y.w.study.alg.array;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map;
  * return [0, 1].
  *
  */
-public class TwoSum
+public class TwoSum2
 {
     static int[] twoSum(int [] nums, int target)
     {

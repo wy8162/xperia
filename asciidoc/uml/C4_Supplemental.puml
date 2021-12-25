@@ -9,7 +9,7 @@
 !include DEVICONS/java.puml
 !include DEVICONS/mysql.puml
 !include FONTAWESOME/users.puml
-LAYOUT_AS_SKETCH()
+'LAYOUT_AS_SKETCH()
 LAYOUT_WITH_LEGEND()
 
 title System Landscape diagram for Big Bank plc

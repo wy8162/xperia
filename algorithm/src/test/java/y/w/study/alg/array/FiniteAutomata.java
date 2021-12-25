@@ -1,4 +1,4 @@
-package y.w.leetcode;
+package y.w.study.alg.array;
 
 /**
  * If, for each pair of states and possible input chars, there is a unique next state

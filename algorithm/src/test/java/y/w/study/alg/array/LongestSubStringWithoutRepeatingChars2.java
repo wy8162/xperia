@@ -1,4 +1,4 @@
-package y.w.leetcode;
+package y.w.study.alg.array;
 
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  * Explanation: The answer is "wke", with the length of 3.
  *              Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
  */
-public class LongestSubStringWithoutRepeatingChars
+public class LongestSubStringWithoutRepeatingChars2
 {
     /**
      * There could be multiple sub-strings which satisfy the criteria. We will

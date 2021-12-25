@@ -1,4 +1,4 @@
-package y.w.leetcode;
+package y.w.study.alg.array;
 
 import org.junit.Test;
 

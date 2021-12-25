@@ -1,0 +1,166 @@
+@startuml
+!include <C4/C4_Context>
+title System Context - Documents Systems
+scale 1
+Person(anonymous, "Person", "Anybody on the web")
+Person(aggregate, "Person", "A user or business with contents")
+Person(admin, "Person", "A user, signed in with admin role")
+
+System(bank, "Banking Software", "Banking system which provides account management, etc")
+System_Ext(clearing, "Clearing House", "FedWire clearing house")
+System_Ext(partner, "Partner Bank", "Banking business partners")
+System_Ext(regulatory, "Gov Regulations", "Regulatory")
+System_Ext(booking, "Treasury Department", "Accounting")
+
+Rel(anonymous, bank, "Clients who are interested in bank")
+Rel(aggregate, bank, "Bank clients who access bank for services")
+Rel(admin, bank, "Admin who operates the bank system")
+Rel(bank, clearing, "Send and receive fund through clearing")
+Rel(bank, partner, "Interfacing")
+Rel(bank, regulatory, "Checking compliance")
+Rel_Right(bank, booking, "Fund movement")
+@enduml
+@startuml
+!include <C4/C4_Container>
+title Web App Container : High Level Technology Choice
+Person(anonymous, "Person", "Anybody on the web")
+Person(aggregate, "Person", "A user or business with contents")
+Person(admin, "Person", "A user, signed in with admin role")
+
+System_Boundary(cb, "System Boundary") {
+  Container(web, "Web Application", "Spring MVC, Apache Tomcat", "Allows users to view bank accounts")
+  Container_Ext(rdb, "Relational Database", "MySQL", "Stores accounts, etc")
+  Container_Ext(fs, "File System", "Linux NFS", "Stores temporary data")
+  Container(nosql, "Document Store", "DynamoDB", "Stores customer documents")
+  Container(man, "Content Updater", "Web App", "Updates contents, etc")
+}
+
+System_Ext(apigateway, "API Gateway", "API Gateway")
+System_Ext(lb, "Load Balancer", "Load Balancer")
+System_Ext(clearing, "Clearing House", "FedWire clearing house")
+System_Ext(partner, "Partner Bank", "Banking business partners")
+System_Ext(regulatory, "Gov Regulations", "Regulatory")
+
+Rel(anonymous, apigateway, "Uses HTTPS")
+Rel(aggregate, apigateway, "Uses HTTPS")
+Rel(admin, apigateway, "Uses HTTPS")
+Rel(apigateway, lb, "Uses HTTPS / correlationId")
+Rel(lb, web, "Uses HTTPS")
+Rel(web, rdb, "SQL/JDBC")
+Rel(web, nosql, "Read/Write documents")
+Rel(web, fs, "Disk I/O")
+Rel_Up(man, rdb, "SQL")
+Rel_Up(man, fs, "Files")
+Rel_Up(man, nosql, "Queries")
+Rel_Up(clearing, man, "Docs")
+Rel_Up(partner, man, "Docs")
+Rel_Up(regulatory, man, "Doc")
+@enduml
+@startuml
+!include <C4/C4_Component>
+title Component Diagram - Building Blocks and Interactions
+Person(anonymous, "Person", "Anybody on the web")
+Person(aggregate, "Person", "A user or business with contents")
+Person(admin, "Person", "A user, signed in with admin role")
+Container_Boundary(webContainer, "Web Application") {
+  Component(controller, "Controller", "Application Service - Spring Controller", "Accepts requests and responds with results")
+  Component(service, "Service", "Domain Service", "Process business logic")
+  Component(bookingConfirmation, "Booking Confirmation", "Aggregate Entity", "Creates booking, get payments, and make reservation, send notification")
+  Component(paymentConfirmation, "Payment Confirmation", "Payment Entity")
+  Component(reservation, "Reservation", "Reservation Entity")
+  Component(metric, "Metric", "Splunk, Newrelic, Prometheus, Open Telemetry", "Metrics")
+  Component(springContainer, "Spring Container", "Spring beans, MVC, security, etc")
+}
+
+System_Ext(kafka, "Kafka Cluster", "Notifications")
+System_Ext(paymentGW, "Payment Gateway", "Make Payment")
+System_Ext(partnerService, "Partner API", "Make Reservation")
+System_Ext(s3, "S3", "Configuration data")
+System_Ext(splunk, "Splunk", "Logs and audit")
+System_Ext(newrelic, "Newrelic", "Monitoring")
+
+Rel_R(controller, metric, "Request counter, logs, etc")
+Rel_Up(service, metric, "Request counter, logs, etc")
+Rel_L(springContainer, s3, "Load configurations")
+Rel_R(metric, splunk, "Log information")
+Rel_R(metric, newrelic, "Metrics")
+
+Rel_Down(anonymous, controller, "HTTPS REST / correlationId / JSON / HTTP 500, 200/201 (created), 401(Unauth), 403(Forbidden), etc")
+Rel_Down(aggregate, controller, "HTTPS REST / correlationId / JSON / HTTP 500, 200/201 (created), 401(Unauth), 403(Forbidden), etc")
+Rel_Down(admin, controller, "REST / correlationI dJSON / HTTP 500, 200/201 (created), 401(Unauth), 403(Forbidden), etc")
+Rel_Down(controller, service, "Booking processing: successful / failed / Rollback")
+Rel_Down(service, bookingConfirmation, "Create booking confirmation")
+Rel_Down(service, paymentConfirmation, "Request for payment")
+Rel_Down(service, reservation, "Make reservation")
+Rel_Down(service, paymentConfirmation, "Request for payment")
+Rel_Down(service, kafka, "Send notifications")
+Rel_Down(paymentConfirmation, paymentGW, "HTTP REST/correlationId")
+Rel_Down(bookingConfirmation, partnerService, "HTTP REST/correlationId")
+@enduml
+@startuml
+title Class Diagram
+package x.y.booking.model {
+  class BookingConfirmation <<aggregate entity>> {
+    -PaymentConfirmation: paymentConfirmation
+    -ReservationConfirmation reservation
+
+    +processPayment()
+    +processReservation()
+    +cancelPayment()
+    +refund()
+    +cancelReservation()
+  }
+
+  enum state {
+    PENDING_RESERVATION
+    PENDING_PAYMENT
+    PAYMENT_IN_PROGRESS
+    RESERVATION_IN_PROGRESS
+  }
+
+  class ReservationConfirmation <<entity>> {
+    - List<LineItem> items
+  }
+
+  class PaymentConfirmation <<entity>> {
+    - BigDecimal: amount
+    - String: currency
+    - String: creditCardNumberLastFourDigit
+  }
+
+  class LineItem <<value object>> {}
+}
+
+BookingConfirmation -- state : defines
+BookingConfirmation "1" *-- "1" ReservationConfirmation
+BookingConfirmation "1" *-- "1" PaymentConfirmation
+ReservationConfirmation "1" *-- "*"LineItem
+@enduml
+@startuml
+header BookingConfirmation State Machine
+title BookingConfirmation State Diagram
+[*] --> PENDING_PAYMENT : BookingConfirmation instance created
+PENDING_PAYMENT : Customer has committed to the referenceProposal
+PENDING_PAYMENT : but the payment has not been paid yet.
+
+state Reservation {
+  PENDING_RESERVATION -> RESERVATION_IN_PROGRESS
+  PENDING_RESERVATION : customer has paid. Reservation has not started.
+
+  RESERVATION_IN_PROGRESS -> RESERVATION_CONFIRMED
+  RESERVATION_IN_PROGRESS : reservation has been started
+  RESERVATION_CONFIRMED : all reservations have been confirmed
+}
+
+state Cancellation {
+  CANCELLATION_IN_PROGRESS -> CANCELLED
+}
+
+PENDING_PAYMENT --> Reservation
+PENDING_PAYMENT --> Cancellation
+RESERVATION_CONFIRMED --> Cancellation
+
+CANCELLED --> [*]
+RESERVATION_CONFIRMED --> [*]
+
+@enduml
