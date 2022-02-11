@@ -1,6 +1,7 @@
 package y.w.j8.j8.future;
 
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
  * Date: 6/21/2019
  * Time: 09:56
  */
-@Log4j
+@Slf4j
 public class CompletableFutureScenariosTest
 {
     /**
