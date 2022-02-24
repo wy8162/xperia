@@ -3,20 +3,20 @@
  */
 package y.w.j8.multithreading;
 
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
 /**
  * @author yangwang
  *
  */
+@Slf4j
 public class BoundedBufferTest {
 	private static final long LOCKOUT_DETECT_TIMEOUT = 1000;
-	static Logger log = Logger.getLogger(BoundedBuffer.class);
 
 	@Test public void testIsEmptyWhenConstructed() {
 		BoundedBuffer<Integer> bb = new BoundedBuffer<Integer>(10);

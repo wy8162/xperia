@@ -2,6 +2,7 @@ package y.w.j8.j8.future;
 
 import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.Before;
@@ -28,7 +29,7 @@ import static java.util.stream.Collectors.toList;
  * @author ywang
  * Date: 6/20/2019
  */
-@Log4j
+@Slf4j
 public class CompletableFutureAsync2Test
 {
     private static String prodName = "prod";

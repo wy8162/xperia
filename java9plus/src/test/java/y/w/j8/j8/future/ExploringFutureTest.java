@@ -1,14 +1,12 @@
 package y.w.j8.j8.future;
 
-import lombok.extern.log4j.Log4j;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
 /**
  * https://www.nurkiewicz.com/2013/05/java-8-definitive-guide-to.html
@@ -16,7 +14,7 @@ import static org.junit.Assert.assertTrue;
  * @author ywang
  * Date: 6/20/2019
  */
-@Log4j
+@Slf4j
 public class ExploringFutureTest
 {
     static final private String someString = "someString";

@@ -1,11 +1,16 @@
 package y.w.j8.j8.future;
 
-import lombok.extern.log4j.Log4j;
-import org.junit.Test;
-
-import java.util.concurrent.*;
-
 import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
 /**
  * Test future
@@ -13,7 +18,7 @@ import static org.junit.Assert.assertTrue;
  * @author ywang
  * Date: 6/20/2019
  */
-@Log4j
+@Slf4j
 public class FutureTest
 {
     static final private String someString = "someString";

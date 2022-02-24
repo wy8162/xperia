@@ -1,16 +1,20 @@
 package y.w.j8.j8.future;
 
-import lombok.extern.log4j.Log4j;
-import org.apache.commons.math3.random.RandomDataGenerator;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
-
-import static org.junit.Assert.assertEquals;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test CompletableFuture
@@ -18,7 +22,7 @@ import static org.junit.Assert.assertEquals;
  * @author ywang
  * Date: 6/20/2019
  */
-@Log4j
+@Slf4j
 public class CompletableFutureTest
 {
     private static String prodName = "prod";
